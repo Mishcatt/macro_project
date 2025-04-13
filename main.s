@@ -168,13 +168,13 @@ readjoyx:           ; X register = 0 for controller 1, 1 for controller 2
     rts
 
 DoDrawing:
-    ldx #$00 	; Set SPR-RAM address to 0
-    stx OAMADDR
-    @loop:	lda hello, x 	; Load the hello message into SPR-RAM
-        sta OAMDATA
+    ldx #$00
+    @loop:	lda hello, x
+        sta OAM, x         ; Load the hello message into OAM
         inx
         cpx #$1c
         bne @loop
+    inc dmaflag
     rts
 
 MusicEngine:
@@ -235,7 +235,7 @@ nmi:
 
 hello:
     .byte $00, $00, $00, $00 	; Why do I need these here?
-    .byte $00, $00, $00, $00    ; X, CHR1, CHR2, Y ?
+    .byte $00, $00, $00, $00    ; Ypos, Index, Attributes, Xpos
     .byte $60, $01, $00, $80
     .byte $64, $01, $00, $84
     .byte $68, $01, $00, $88
