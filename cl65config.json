@@ -1,0 +1,5 @@
+{
+  "executable": "cl65",
+  "input": "main.s",
+  "params": "--verbose --target nes -o macro.nes"
+}
