@@ -75,7 +75,7 @@ vblankwait2:
 
 main:
 load_palettes:
-    lda PPUSTATUS ; todo: not necessary?
+    lda PPUSTATUS ; clear w register by reading Status
     lda #$3f
     sta PPUADDR
     lda #$00
@@ -92,9 +92,19 @@ load_palettes:
 enable_rendering:
     lda #%10000000	; Enable NMI
     sta PPUCTRL
-    lda #%00010000	; Enable Sprites
+    lda #%00011000	; Enable Sprites and Background
     sta PPUMASK
     inc drawflag
+
+load_initial_sprites:
+    ldx #$00
+    @loop:
+        lda hello, x
+        sta OAM, x         ; Load the sprites into OAM
+        inx
+        cpx #$1c
+        bne @loop
+    inc dmaflag
 
 forever:
     jmp forever
@@ -121,12 +131,16 @@ readjoyx:           ; X register = 0 for controller 1, 1 for controller 2
 
 DoDrawing:
     ldx #$00
-    @loop:	lda hello, x
-        sta OAM, x         ; Load the hello message into OAM
+    lda #$21
+    sta PPUADDR
+    lda #$08
+    sta PPUADDR
+    @loop:
+        lda hello, x
+        sta PPUDATA
         inx
         cpx #$1c
         bne @loop
-    inc dmaflag
     rts
 
 MusicEngine:
@@ -188,11 +202,11 @@ nmi:
 hello:
     .byte $00, $00, $00, $00 	; Why do I need these here?
     .byte $00, $00, $00, $00    ; Ypos, Index, Attributes, Xpos
-    .byte $60, $01, $00, $80
-    .byte $64, $01, $00, $84
-    .byte $68, $01, $00, $88
-    .byte $6C, $01, $00, $8C
-    .byte $70, $01, $00, $90
+    .byte $60, $01, $00, $60
+    .byte $64, $02, $00, $70
+    .byte $68, $03, $00, $80
+    .byte $6C, $04, $00, $90
+    .byte $70, $05, $00, $A0
 
 palettes:
     ; Background Palette
@@ -209,9 +223,19 @@ palettes:
 
 ; Character memory
 .segment "CHARS"
-    .byte %10000010	; H (00)
-    .byte %11000001
-    .byte %11000010
+    .byte %00011000	; A (00)
+    .byte %00111100
+    .byte %01100110
+    .byte %11000011
+    .byte %11111111
+    .byte %11111111
+    .byte %11000011
+    .byte %11000011
+    .byte $00, $00, $00, $00, $00, $00, $00, $00 ; High bytes of characters
+
+    .byte %11000011	; H (01)
+    .byte %11000011
+    .byte %11000011
     .byte %11111111
     .byte %11111111
     .byte %11000011
@@ -219,8 +243,8 @@ palettes:
     .byte %11000011
     .byte $00, $00, $00, $00, $00, $00, $00, $00 ; High bytes of characters
 
-    .byte %10011010	; E (01)
-    .byte %11100101
+    .byte %11111111	; E (02)
+    .byte %11111111
     .byte %11000000
     .byte %11111100
     .byte %11111100
@@ -229,7 +253,7 @@ palettes:
     .byte %11111111
     .byte $00, $00, $00, $00, $00, $00, $00, $00
 
-    .byte %11000000	; L (02)
+    .byte %11000000	; L (03)
     .byte %11000000
     .byte %11000000
     .byte %11000000
@@ -239,7 +263,7 @@ palettes:
     .byte %11111111
     .byte $00, $00, $00, $00, $00, $00, $00, $00
 
-    .byte %01111110	; O (03)
+    .byte %01111110	; O (04)
     .byte %11100111
     .byte %11000011
     .byte %11000011
@@ -247,4 +271,14 @@ palettes:
     .byte %11000011
     .byte %11100111
     .byte %01111110
+    .byte $00, $00, $00, $00, $00, $00, $00, $00
+
+    .byte %11011011	; W (05)
+    .byte %11011011
+    .byte %11011011
+    .byte %11011011
+    .byte %11011011
+    .byte %11011011
+    .byte %01100110
+    .byte %01100110
     .byte $00, $00, $00, $00, $00, $00, $00, $00
