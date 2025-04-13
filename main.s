@@ -92,9 +92,17 @@ load_palettes:
 enable_rendering:
     lda #%10000000	; Enable NMI
     sta PPUCTRL
+    sta softPPUCTRL
     lda #%00011000	; Enable Sprites and Background
     sta PPUMASK
+    sta softPPUMASK
     inc drawflag
+
+set_scroll:
+    lda #$00
+    sta xscroll
+    sta yscroll
+    inc ppuflag
 
 load_initial_sprites:
     ldx #$00
