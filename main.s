@@ -3,6 +3,21 @@
 DRAWBUFFER := $0100  ; Beginning of Drawing Buffer
 OAM        := $0200  ; Beginning of OAM Shadow buffer
 
+sprite0y = 0
+sprite0x = 3
+sprite1y = 4
+sprite1x = 7
+sprite2y = 8
+sprite2x = 11
+sprite3y = 12
+sprite3x = 15
+sprite4y = 16
+sprite4x = 19
+sprite5y = 20
+sprite5x = 23
+sprite6y = 24
+sprite6x = 27
+
 .zeropage
 buttons:    .res 2
 
@@ -12,7 +27,7 @@ softPPUMASK:   .res 1
 dmaflag:    .res 1
 drawflag:   .res 1
 ppuflag:    .res 1
-sleeping:   .res 1
+nmi_flag:   .res 1
 
 xscroll:    .res 1
 yscroll:    .res 1
@@ -93,29 +108,75 @@ enable_rendering:
     lda #%10000000	; Enable NMI
     sta PPUCTRL
     sta softPPUCTRL
-    lda #%00011000	; Enable Sprites and Background
+    lda #%00011010	; Enable Sprites and Background
     sta PPUMASK
     sta softPPUMASK
-    inc drawflag
+    ; inc drawflag
 
 set_scroll:
     lda #$00
     sta xscroll
     sta yscroll
-    inc ppuflag
+    ; inc ppuflag
 
 load_initial_sprites:
     ldx #$00
     @loop:
-        lda hello, x
+        lda sprites, x
         sta OAM, x         ; Load the sprites into OAM
         inx
         cpx #$1c
         bne @loop
-    inc dmaflag
+    ; inc dmaflag
 
-forever:
-    jmp forever
+main_loop:
+    lda nmi_flag
+    beq main_loop   ; wait for nmi_flag
+    dec nmi_flag
+    jsr readjoyx2
+    inc xscroll
+    inc yscroll
+    ldx #sprite2y
+    inc OAM, x
+    ldx #sprite2x
+    inc OAM, x
+    ldx #sprite3y
+    dec OAM, x
+    ldx #sprite3x
+    dec OAM, x
+    ldx #sprite4y
+    inc OAM, x
+    ldx #sprite4x
+    dec OAM, x
+    ldx #sprite5y
+    dec OAM, x
+    ldx #sprite5x
+    inc OAM, x
+
+    ldx #sprite6y
+    lda buttons
+    and #BUTTON_UP
+    beq :+
+        dec OAM, x
+:   lda buttons
+    and #BUTTON_DOWN
+    beq :+
+        inc OAM, x
+    
+:   ldx #sprite6x
+    lda buttons
+    and #BUTTON_LEFT
+    beq :+
+        dec OAM, x
+:   lda buttons
+    and #BUTTON_RIGHT
+    beq :+
+        inc OAM, x
+
+:   inc ppuflag
+    inc drawflag
+    inc dmaflag
+    jmp main_loop
 
 readjoyx2:
     ldx #$00
@@ -144,7 +205,7 @@ DoDrawing:
     lda #$08
     sta PPUADDR
     @loop:
-        lda hello, x
+        lda sprites, x
         sta PPUDATA
         inx
         cpx #$1c
@@ -174,12 +235,12 @@ nmi:
 
     @check_draw_flag:
         lda drawflag          ; do other PPU drawing (NT/Palette/whathaveyou)
-        beq @check_ppureg_flag ; conditional via the 'drawflag' flag
+        beq @check_ppu_flag ; conditional via the 'drawflag' flag
             bit PPUSTATUS         ; clear VBl flag, reset PPUSCROLL/PPUADDR toggle
             jsr DoDrawing     ; draw the stuff from the drawing buffer
             dec drawflag
 
-    @check_ppureg_flag:
+    @check_ppu_flag:
         lda ppuflag
         beq @music_handler
             lda softPPUMASK   ; copy buffered PPUCTRL/PPUMASK (conditional via ppuflag)
@@ -196,9 +257,8 @@ nmi:
     @music_handler:
         jsr MusicEngine
 
-    lda #0         ; clear the sleeping flag so that WaitFrame will exit
-    sta sleeping   ; note that you should not 'dec' here, as sleeping might
-                   ; already be zero (will be the case during slowdown)
+    lda #1         
+    sta nmi_flag   ; set the nmi_flag flag so that main_loop will continue
 
     pla            ; restore regs and exit
     tay
@@ -207,7 +267,7 @@ nmi:
     pla
     rti
 
-hello:
+sprites:
     .byte $00, $00, $00, $00 	; Why do I need these here?
     .byte $00, $00, $00, $00    ; Ypos, Index, Attributes, Xpos
     .byte $60, $01, $00, $60

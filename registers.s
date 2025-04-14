@@ -45,3 +45,12 @@ JOYPAD2    := $4017 	; MI-- ---- 	W   Frame Counter Mode (M, 0 = 4-step, 1 = 5-s
                         ;                   D2 	Famicom microphone (controller 2 only)
                         ;                   D3 	Zapper light sense
                         ;                   D4 	Zapper trigger 
+
+BUTTON_A      = 1 << 7
+BUTTON_B      = 1 << 6
+BUTTON_SELECT = 1 << 5
+BUTTON_START  = 1 << 4
+BUTTON_UP     = 1 << 3
+BUTTON_DOWN   = 1 << 2
+BUTTON_LEFT   = 1 << 1
+BUTTON_RIGHT  = 1 << 0
