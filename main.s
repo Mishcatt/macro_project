@@ -35,6 +35,9 @@ nmi_flag:   .res 1
 xscroll:    .res 1
 yscroll:    .res 1
 
+currentRenderColumn: .res 1
+currentRenderRow:    .res 1
+
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
   .byte $4E, $45, $53, $1A
@@ -108,7 +111,7 @@ load_palettes:
         bne @loop
 
 enable_rendering:
-    lda #%10000000	; Enable NMI
+    lda #%10000100	; Enable NMI and vertical increment
     sta PPUCTRL
     sta softPPUCTRL
     lda #%00011010	; Enable Sprites and Background
@@ -136,11 +139,11 @@ main_loop:
     lda nmi_flag
     beq main_loop   ; wait for nmi_flag
     dec nmi_flag
-    
-    jsr readjoyx2
 
-    inc xscroll
-    inc yscroll
+    jsr readjoyx2   ; read two gamepads
+
+    ; inc xscroll
+    ; inc yscroll
 
     ldx #sprite2y
     inc OAM, x
@@ -209,17 +212,32 @@ readjoyx:           ; X register = 0 for controller 1, 1 for controller 2
     rts
 
 DoDrawing:
+    lda PPUSTATUS ; clear w register by reading Status
+    lda #$20      ; nametable 0
+    sta PPUADDR
+    ldx currentRenderColumn
+    stx PPUADDR
+
+    inx         ; next column
+    cpx #$20    ; over last column?
+    bcc :+
+        ldx #0  ; back to column 0
+    :
+    stx currentRenderColumn
+
     ldx #$00
-    lda #$21
-    sta PPUADDR
-    lda #$08
-    sta PPUADDR
-    @loop:
-        lda sprites, x
-        sta PPUDATA
-        inx
-        cpx #$1c
-        bne @loop
+    lda #0
+    sta PPUDATA
+    lda #5
+    sta PPUDATA
+    lda #0
+    sta PPUDATA
+    lda #6
+    sta PPUDATA
+    lda #0
+    sta PPUDATA
+    lda #5
+    sta PPUDATA
     rts
 
 MusicEngine:
@@ -280,11 +298,11 @@ nmi:
 sprites:
     .byte $00, $00, $00, $00 	; Why do I need these here?
     .byte $00, $00, $00, $00    ; Ypos, Index, Attributes, Xpos
-    .byte $60, $01, $00, $60
-    .byte $64, $02, $00, $70
-    .byte $68, $03, $00, $80
-    .byte $6C, $04, $00, $90
-    .byte $70, $05, $00, $A0
+    .byte $60, $02, $00, $60
+    .byte $64, $03, $00, $70
+    .byte $68, $04, $00, $80
+    .byte $6C, $05, $00, $90
+    .byte $70, $06, $00, $A0
 
 palettes:
     ; Background Palette
@@ -301,7 +319,11 @@ palettes:
 
 ; Character memory
 .segment "CHARS"
-    .byte %00011000	; A (00)
+    ; (00)
+    .byte $00, $00, $00, $00, $00, $00, $00, $00 ; Low bytes of characters
+    .byte $00, $00, $00, $00, $00, $00, $00, $00 ; High bytes of characters
+
+    .byte %00011000	; A (01)
     .byte %00111100
     .byte %01100110
     .byte %11000011
@@ -311,7 +333,7 @@ palettes:
     .byte %11000011
     .byte $00, $00, $00, $00, $00, $00, $00, $00 ; High bytes of characters
 
-    .byte %11000011	; H (01)
+    .byte %11000011	; H (02)
     .byte %11000011
     .byte %11000011
     .byte %11111111
@@ -321,7 +343,7 @@ palettes:
     .byte %11000011
     .byte $00, $00, $00, $00, $00, $00, $00, $00 ; High bytes of characters
 
-    .byte %11111111	; E (02)
+    .byte %11111111	; E (03)
     .byte %11111111
     .byte %11000000
     .byte %11111100
@@ -331,7 +353,7 @@ palettes:
     .byte %11111111
     .byte $00, $00, $00, $00, $00, $00, $00, $00
 
-    .byte %11000000	; L (03)
+    .byte %11000000	; L (04)
     .byte %11000000
     .byte %11000000
     .byte %11000000
@@ -341,7 +363,7 @@ palettes:
     .byte %11111111
     .byte $00, $00, $00, $00, $00, $00, $00, $00
 
-    .byte %01111110	; O (04)
+    .byte %01111110	; O (05)
     .byte %11100111
     .byte %11000011
     .byte %11000011
@@ -351,7 +373,7 @@ palettes:
     .byte %01111110
     .byte $00, $00, $00, $00, $00, $00, $00, $00
 
-    .byte %11011011	; W (05)
+    .byte %11011011	; W (06)
     .byte %11011011
     .byte %11011011
     .byte %11011011
