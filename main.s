@@ -18,6 +18,9 @@ sprite5x = 23
 sprite6y = 24
 sprite6x = 27
 
+buttons1 = buttons
+buttons2 = buttons + 1
+
 .zeropage
 buttons:    .res 2
 
@@ -133,9 +136,12 @@ main_loop:
     lda nmi_flag
     beq main_loop   ; wait for nmi_flag
     dec nmi_flag
+    
     jsr readjoyx2
+
     inc xscroll
     inc yscroll
+
     ldx #sprite2y
     inc OAM, x
     ldx #sprite2x
@@ -154,26 +160,30 @@ main_loop:
     inc OAM, x
 
     ldx #sprite6y
-    lda buttons
+    lda buttons1
     and #BUTTON_UP
     beq :+
         dec OAM, x
-:   lda buttons
+    :
+    lda buttons1
     and #BUTTON_DOWN
     beq :+
         inc OAM, x
-    
-:   ldx #sprite6x
-    lda buttons
+    :
+
+    ldx #sprite6x
+    lda buttons1
     and #BUTTON_LEFT
     beq :+
         dec OAM, x
-:   lda buttons
+    :
+    lda buttons1
     and #BUTTON_RIGHT
     beq :+
         inc OAM, x
+    :
 
-:   inc ppuflag
+    inc ppuflag
     inc drawflag
     inc dmaflag
     jmp main_loop
