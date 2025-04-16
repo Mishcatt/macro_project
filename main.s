@@ -17,8 +17,11 @@ nmi_flag:   .res 1
 xscroll:    .res 1
 yscroll:    .res 1
 
-currentRenderColumn: .res 1
+currentMapColumn: .res 1
 currentRenderRow:    .res 1
+
+;leftRenderColumn: .res 30
+;rightRenderColumn: .res 30
 
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
@@ -193,38 +196,113 @@ readjoyx:           ; X register = 0 for controller 1, 1 for controller 2
     rts
 
 DoDrawing:
-    lda PPUSTATUS ; clear w register by reading Status
-    lda #$20      ; nametable 0
+    lda #%10000100  ; Enable NMI and vertical increment
+    sta PPUCTRL
+    lda PPUSTATUS   ; clear w register by reading Status
+    lda #$20        ; nametable 0, TODO: nametable 1
     sta PPUADDR
-    ldx currentRenderColumn
-    stx PPUADDR
+    lda currentMapColumn 
+    tax             ; copy map column number to X
+    asl a           ; map columns are 16px, PPU columns are 8px, so x2
+    sta PPUADDR
 
+    lda map, x      ; load column type number to A
+    asl a
+    asl a
+    asl a
+    asl a           ; x16 (column size)
+    tax             ; copy top block type address to X
+    tay             ; copy top block type address to Y
+
+    @loop1:
+        tya
+        tax
+        lda columns, x  ; load block type number to A
+        asl a 
+        asl a           ; x4 (block size)
+        tax             ; copy char type address to X
+        lda blocks, x   ; load char number to A
+        sta PPUDATA
+        inx
+        lda blocks, x   ; load char number to A
+        sta PPUDATA
+        iny
+        cpy #15         ; last row
+        bcc @loop1
+
+    lda #$20        ; nametable 0, TODO: nametable 1
+    sta PPUADDR
+    lda currentMapColumn 
+    tax             ; copy map column number to X
+    asl a           ; map columns are 16px, PPU columns are 8px, so x2
+    ora #1          ; add 1
+    sta PPUADDR
+
+    lda map, x      ; load column type number to A
+    asl a
+    asl a
+    asl a
+    asl a           ; x16 (column size)
+    tax             ; copy top block type address to X
+    tay             ; copy top block type address to Y
+
+    @loop2:
+        tya
+        tax
+        lda columns, x  ; load block type number to A
+        asl a 
+        asl a           ; x4 (block size)
+        tax             ; copy char type address to X
+        lda blocks, x   ; load char number to A
+        sta PPUDATA
+        inx
+        lda blocks, x   ; load char number to A
+        sta PPUDATA
+        iny
+        cpy #15         ; last row
+        bcc @loop2
+
+    lda #$23    ; nametable 0 attribute table
+    sta PPUADDR
+    lda currentMapColumn
+    adc #$C0
+    sta PPUADDR
+
+    lda map, x      ; load column type number to A
+    asl a
+    asl a
+    asl a
+    asl a           ; x16 (column size)
+    tax             ; copy top block type address to X
+    tay             ; copy top block type address to Y
+
+    @loop3:
+        tya
+        tax
+        lda columns, x      ; load block type number to A
+        tax
+        lda blockColors, x  ; load block color number to X
+        ; lda #1
+        sta PPUDATA
+        iny
+        cpy #15         ; last row
+        bcc @loop3
+
+    ldx currentMapColumn
     inx         ; next column
-    cpx #$20    ; over last column?
+    cpx #$10    ; over last column?
     bcc :+
         ldx #0  ; back to column 0
     :
-    stx currentRenderColumn
+    stx currentMapColumn
 
-    ldx #$00
-    lda #0
-    sta PPUDATA
-    lda #5
-    sta PPUDATA
-    lda #0
-    sta PPUDATA
-    lda #6
-    sta PPUDATA
-    lda #0
-    sta PPUDATA
-    lda #5
-    sta PPUDATA
     rts
 
 MusicEngine:
     rts
 
 .include "nmi.s"
+.include "maps.s"
 .include "sprites.s"
 .include "palettes.s"
 .include "chars.s"

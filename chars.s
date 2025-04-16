@@ -1,7 +1,7 @@
 ; Character memory
 .segment "CHARS"
-    ; (00)
-    .byte $00, $00, $00, $00, $00, $00, $00, $00 ; Low bytes of characters
+    ; background (00)
+    .byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff ; Low bytes of characters
     .byte $00, $00, $00, $00, $00, $00, $00, $00 ; High bytes of characters
 
     .byte %00011000	; A (01)
