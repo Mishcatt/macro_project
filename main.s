@@ -1,28 +1,10 @@
 .include "registers.s"
-
-DRAWBUFFER := $0100  ; Beginning of Drawing Buffer
-OAM        := $0200  ; Beginning of OAM Shadow buffer
-
-sprite0y = 0
-sprite0x = 3
-sprite1y = 4
-sprite1x = 7
-sprite2y = 8
-sprite2x = 11
-sprite3y = 12
-sprite3x = 15
-sprite4y = 16
-sprite4x = 19
-sprite5y = 20
-sprite5x = 23
-sprite6y = 24
-sprite6x = 27
-
-buttons1 = buttons
-buttons2 = buttons + 1
+.include "const.s"
 
 .zeropage
 buttons:    .res 2
+
+currentState: .res 1
 
 softPPUCTRL:   .res 1
 softPPUMASK:   .res 1
@@ -144,24 +126,24 @@ main_loop:
     ; inc xscroll
     ; inc yscroll
 
-    ldx #sprite2y
+    ldx #Sprites::Sprite2y
     inc OAM, x
-    ldx #sprite2x
+    ldx #Sprites::Sprite2x
     inc OAM, x
-    ldx #sprite3y
+    ldx #Sprites::Sprite3y
     dec OAM, x
-    ldx #sprite3x
+    ldx #Sprites::Sprite3x
     dec OAM, x
-    ldx #sprite4y
+    ldx #Sprites::Sprite4y
     inc OAM, x
-    ldx #sprite4x
+    ldx #Sprites::Sprite4x
     dec OAM, x
-    ldx #sprite5y
+    ldx #Sprites::Sprite5y
     dec OAM, x
-    ldx #sprite5x
+    ldx #Sprites::Sprite5x
     inc OAM, x
 
-    ldx #sprite6y
+    ldx #Sprites::Sprite6y
     lda buttons1
     and #BUTTON_UP
     beq :+
@@ -173,7 +155,7 @@ main_loop:
         inc OAM, x
     :
 
-    ldx #sprite6x
+    ldx #Sprites::Sprite6x
     lda buttons1
     and #BUTTON_LEFT
     beq :+
