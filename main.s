@@ -19,6 +19,7 @@ yscroll:    .res 1
 
 currentMapColumn: .res 1
 currentRenderRow:    .res 1
+temp: .res 1
 
 ;leftRenderColumn: .res 30
 ;rightRenderColumn: .res 30
@@ -158,16 +159,26 @@ main_loop:
         inc OAM, x
     :
 
-    ldx #Sprites::Sprite6x
+    ; ldx #Sprites::Sprite6x
     lda buttons1
     and #BUTTON_LEFT
     beq :+
-        dec OAM, x
+        dec xscroll
+        lda xscroll
+        cmp #$FF
+        bne :+
+        lda softPPUCTRL
+        eor #%00000001 ; swap nametable 0 and 1
+        sta softPPUCTRL
     :
     lda buttons1
     and #BUTTON_RIGHT
     beq :+
-        inc OAM, x
+        inc xscroll
+        bne :+
+        lda softPPUCTRL
+        eor #%00000001 ; swap nametable 0 and 1
+        sta softPPUCTRL
     :
 
     inc ppuflag
@@ -262,10 +273,12 @@ DoDrawing:
         cpy #15         ; last row
         bcc @loop2
 
+    lda #%10000000  ; Enable NMI and horizontal increment
+    sta PPUCTRL
     lda #$23    ; nametable 0 attribute table
     sta PPUADDR
-    lda currentMapColumn
-    adc #$C0
+    lda #$C0
+    adc currentMapColumn
     sta PPUADDR
 
     lda map, x      ; load column type number to A
@@ -279,13 +292,25 @@ DoDrawing:
     @loop3:
         tya
         tax
+        lda #$23
+        sta PPUADDR
+        lda currentMapColumn
+        sta temp
+        lsr temp
+        tya
+        asl a
+        asl a
+        asl a
+        adc #$C0
+        adc temp
+        sta PPUADDR
         lda columns, x      ; load block type number to A
         tax
         lda blockColors, x  ; load block color number to X
         ; lda #1
         sta PPUDATA
         iny
-        cpy #15         ; last row
+        cpy #7         ; last row
         bcc @loop3
 
     ldx currentMapColumn

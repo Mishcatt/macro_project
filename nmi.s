@@ -24,8 +24,8 @@ nmi:
             dec drawflag
 
     @check_ppu_flag:
-        lda ppuflag
-        beq @music_handler
+        ; lda ppuflag
+        ; beq @music_handler
             lda softPPUMASK   ; copy buffered PPUCTRL/PPUMASK (conditional via ppuflag)
             sta PPUMASK
             lda softPPUCTRL
@@ -35,7 +35,7 @@ nmi:
             sta PPUSCROLL
             lda yscroll
             sta PPUSCROLL
-            dec ppuflag
+            ; dec ppuflag
 
     @music_handler:
         jsr MusicEngine
