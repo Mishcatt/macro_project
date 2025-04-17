@@ -17,6 +17,8 @@ nmi_flag:   .res 1
 xscroll:    .res 1
 yscroll:    .res 1
 
+currentCenter: .res 1
+
 currentMapColumn: .res 1
 currentRenderRow:    .res 1
 temp: .res 1
@@ -167,18 +169,30 @@ main_loop:
         lda xscroll
         cmp #$FF
         bne :+
-        lda softPPUCTRL
-        eor #%00000001 ; swap nametable 0 and 1
-        sta softPPUCTRL
+            lda softPPUCTRL
+            eor #%00000001 ; swap nametable 0 and 1
+            sta softPPUCTRL
+        :
+        lda xscroll
+        and #%11110000
+        bne :+
+            dec currentCenter
+        :
     :
     lda buttons1
     and #BUTTON_RIGHT
     beq :+
         inc xscroll
         bne :+
-        lda softPPUCTRL
-        eor #%00000001 ; swap nametable 0 and 1
-        sta softPPUCTRL
+            lda softPPUCTRL
+            eor #%00000001 ; swap nametable 0 and 1
+            sta softPPUCTRL
+        :
+        lda xscroll
+        and #%11110000
+        bne :+
+            inc currentCenter
+        :
     :
 
     inc ppuflag
