@@ -41,7 +41,7 @@ nmi:
         jsr MusicEngine
 
     lda #1         
-    sta nmi_flag   ; set the nmi_flag flag so that main_loop will continue
+    sta nmiflag   ; set the nmi_flag flag so that main_loop will continue
 
     pla            ; restore regs and exit
     tay

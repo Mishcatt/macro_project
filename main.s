@@ -12,16 +12,16 @@ softPPUMASK:   .res 1
 dmaflag:    .res 1
 drawflag:   .res 1
 ppuflag:    .res 1
-nmi_flag:   .res 1
+nmiflag:   .res 1
 
 xscroll:    .res 1
 yscroll:    .res 1
 
 currentCenter: .res 1
-
 currentMapColumn: .res 1
-currentRenderRow:    .res 1
-temp: .res 1
+currentRenderRow: .res 1
+tempColumnAddress: .res 1
+tempColorAddress: .res 1
 
 ;leftRenderColumn: .res 30
 ;rightRenderColumn: .res 30
@@ -123,9 +123,9 @@ load_initial_sprites:
     ; inc dmaflag
 
 main_loop:
-    lda nmi_flag
+    lda nmiflag
     beq main_loop   ; wait for nmi_flag
-    dec nmi_flag
+    dec nmiflag
 
     jsr readjoyx2   ; read two gamepads
 
@@ -164,7 +164,7 @@ main_loop:
     ; ldx #Sprites::Sprite6x
     lda buttons1
     and #BUTTON_LEFT
-    beq :+
+    beq noLeftButton
         dec xscroll
         lda xscroll
         cmp #$FF
@@ -178,10 +178,10 @@ main_loop:
         bne :+
             dec currentCenter
         :
-    :
+noLeftButton:
     lda buttons1
     and #BUTTON_RIGHT
-    beq :+
+    beq noRightButton
         inc xscroll
         bne :+
             lda softPPUCTRL
@@ -193,7 +193,7 @@ main_loop:
         bne :+
             inc currentCenter
         :
-    :
+noRightButton:
 
     inc ppuflag
     inc drawflag
@@ -236,12 +236,12 @@ DoDrawing:
     asl a
     asl a
     asl a           ; x16 (column size)
-    tax             ; copy top block type address to X
-    tay             ; copy top block type address to Y
+    sta tempColumnAddress
+    ldy #0
 
     @loop1:
-        tya
-        tax
+        ldx tempColumnAddress   ; load rendering column offset to X
+        inc tempColumnAddress   ; increment the offset
         lda columns, x  ; load block type number to A
         asl a 
         asl a           ; x4 (block size)
@@ -260,7 +260,7 @@ DoDrawing:
     lda currentMapColumn 
     tax             ; copy map column number to X
     asl a           ; map columns are 16px, PPU columns are 8px, so x2
-    ora #1          ; add 1
+    ora #1          ; add 1 for second column
     sta PPUADDR
 
     lda map, x      ; load column type number to A
@@ -268,12 +268,12 @@ DoDrawing:
     asl a
     asl a
     asl a           ; x16 (column size)
-    tax             ; copy top block type address to X
-    tay             ; copy top block type address to Y
+    sta tempColumnAddress
+    ldy #0
 
     @loop2:
-        tya
-        tax
+        ldx tempColumnAddress   ; load rendering column offset to X
+        inc tempColumnAddress   ; increment the offset
         lda columns, x  ; load block type number to A
         asl a 
         asl a           ; x4 (block size)
@@ -289,43 +289,43 @@ DoDrawing:
 
     lda #%10000000  ; Enable NMI and horizontal increment
     sta PPUCTRL
-    lda #$23    ; nametable 0 attribute table
-    sta PPUADDR
-    lda #$C0
-    adc currentMapColumn
-    sta PPUADDR
 
-    lda map, x      ; load column type number to A
-    asl a
-    asl a
-    asl a
-    asl a           ; x16 (column size)
-    tax             ; copy top block type address to X
-    tay             ; copy top block type address to Y
+    lda currentMapColumn
+    and #1
+    bne skipColorRender
+        lda map, x      ; load column type number to A
+        asl a
+        asl a
+        asl a
+        asl a           ; x16 (column size)
+        sta tempColumnAddress
+        ldy #0
 
-    @loop3:
-        tya
-        tax
-        lda #$23
-        sta PPUADDR
-        lda currentMapColumn
-        sta temp
-        lsr temp
-        tya
-        asl a
-        asl a
-        asl a
-        adc #$C0
-        adc temp
-        sta PPUADDR
-        lda columns, x      ; load block type number to A
-        tax
-        lda blockColors, x  ; load block color number to X
-        ; lda #1
-        sta PPUDATA
-        iny
-        cpy #7         ; last row
-        bcc @loop3
+        @loop3:
+            lda #$23
+            sta PPUADDR
+            lda currentMapColumn
+            sta tempColorAddress
+            lsr tempColorAddress
+            tya
+            asl a
+            asl a
+            asl a
+            adc #$C0
+            adc tempColorAddress
+            sta PPUADDR
+            ldx tempColumnAddress
+            inc tempColumnAddress
+            inc tempColumnAddress
+            lda columns, x      ; load block type number to A
+            tax
+            lda blockColors, x  ; load block color number to X
+            ; lda #1
+            sta PPUDATA
+            iny
+            cpy #5         ; last row (should be 7, too many cycles)
+            bcc @loop3
+    skipColorRender:
 
     ldx currentMapColumn
     inx         ; next column
