@@ -1,5 +1,5 @@
 {
   "executable": "cl65",
   "input": "main.s",
-  "params": "--verbose --target nes -o macro.nes"
+  "params": "--verbose -C nrom256.cfg -o macro.nes"
 }
