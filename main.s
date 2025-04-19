@@ -19,9 +19,22 @@ yscroll:    .res 1
 
 currentCenter: .res 1
 currentMapColumn: .res 1
+
+currentRenderColumn: .res 1
 currentRenderRow: .res 1
+
 tempColumnAddress: .res 1
 tempColorAddress: .res 1
+tempMapAddress: .res 1
+tempDrawAddressOffset: .res 1
+
+drawingLoop1: .res 1
+drawingLoop2: .res 1
+
+temp1: .res 1
+temp2: .res 1
+temp3: .res 1
+temp4: .res 1
 
 ;leftRenderColumn: .res 30
 ;rightRenderColumn: .res 30
@@ -195,6 +208,9 @@ noLeftButton:
         :
 noRightButton:
 
+    ;jsr PrepareDrawing
+    jsr PrepareDrawingTest
+
     inc ppuflag
     inc drawflag
     inc dmaflag
@@ -218,6 +234,202 @@ readjoyx:           ; X register = 0 for controller 1, 1 for controller 2
     cmp #$01        ; Set carry if and only if nonzero
     rol buttons, x  ; Carry -> bit 0; but 7 -> Carry
     bcc @loop
+    rts
+
+DoDrawing2:
+    lda #%10000100  ; Enable NMI and vertical increment
+    sta PPUCTRL
+    bit PPUSTATUS   ; clear w register by reading Status
+    ;lda #$20        ; nametable 0, TODO: nametable 1
+    ;sta PPUADDR
+    ;lda currentRenderColumn 
+    ;sta tempMapAddress
+
+    ;lda #30
+    ;sta drawingLoop1
+    ;lda #4
+    ;sta drawingLoop2
+
+    ldx #0 ; start at offset 0
+    ldy #0
+    draw1:
+        lda #$20        ; nametable 0, TODO: nametable 1
+        sta PPUADDR
+        tya
+        clc
+        adc currentRenderColumn
+        sta PPUADDR
+        lda DRAWBUFFER + 0, x   ; 5 cycles
+        sta PPUDATA             ; 4 cycles
+        lda DRAWBUFFER + 1, x
+        sta PPUDATA
+        lda DRAWBUFFER + 2, x
+        sta PPUDATA
+        lda DRAWBUFFER + 3, x
+        sta PPUDATA
+        lda DRAWBUFFER + 4, x
+        sta PPUDATA
+        lda DRAWBUFFER + 5, x
+        sta PPUDATA
+        lda DRAWBUFFER + 6, x
+        sta PPUDATA
+        lda DRAWBUFFER + 7, x
+        sta PPUDATA
+        lda DRAWBUFFER + 8, x
+        sta PPUDATA
+        lda DRAWBUFFER + 9, x
+        sta PPUDATA
+        lda DRAWBUFFER + 10, x
+        sta PPUDATA
+        lda DRAWBUFFER + 11, x
+        sta PPUDATA
+        lda DRAWBUFFER + 12, x
+        sta PPUDATA
+        lda DRAWBUFFER + 13, x
+        sta PPUDATA
+        lda DRAWBUFFER + 14, x
+        sta PPUDATA
+        lda DRAWBUFFER + 15, x
+        sta PPUDATA
+        lda DRAWBUFFER + 16, x
+        sta PPUDATA
+        lda DRAWBUFFER + 17, x
+        sta PPUDATA
+        lda DRAWBUFFER + 18, x
+        sta PPUDATA
+        lda DRAWBUFFER + 19, x
+        sta PPUDATA
+        lda DRAWBUFFER + 20, x
+        sta PPUDATA
+        lda DRAWBUFFER + 21, x
+        sta PPUDATA
+        lda DRAWBUFFER + 22, x
+        sta PPUDATA
+        lda DRAWBUFFER + 23, x
+        sta PPUDATA
+        lda DRAWBUFFER + 24, x
+        sta PPUDATA
+        lda DRAWBUFFER + 25, x
+        sta PPUDATA
+        lda DRAWBUFFER + 26, x
+        sta PPUDATA
+        lda DRAWBUFFER + 27, x
+        sta PPUDATA
+        lda DRAWBUFFER + 28, x
+        sta PPUDATA
+        lda DRAWBUFFER + 29, x
+        sta PPUDATA
+        txa
+        adc #30 ; add offset 30 to DRAWBUFFER
+        tax
+        iny
+        cpy #4
+        beq draw1end
+        jmp draw1
+    draw1end:
+
+    lda currentRenderColumn
+    clc
+    adc #4
+    cmp #32     ; over last column?
+    bcc :+
+        lda #0  ; back to column 0
+    :
+    sta currentRenderColumn
+
+    rts
+
+PrepareDrawingTest:
+    ldy #0
+    @loop2:
+        lda #1   ; load char number to A
+        sta DRAWBUFFER, y
+        iny
+        cpy #120         ; last row
+        bcc @loop2
+    rts
+
+PrepareDrawing:
+    lda currentMapColumn 
+    tax             ; copy map column number to X
+    asl a           ; map columns are 16px, PPU columns are 8px, so x2
+    sta tempMapAddress
+
+    lda map, x      ; load column type number to A
+    asl a
+    asl a
+    asl a
+    asl a           ; x16 (column size)
+    sta tempColumnAddress
+
+    lda #0
+    sta tempDrawAddressOffset
+    @loop1:
+        ldy #0
+        @loop2:
+            ldx tempColumnAddress   ; load rendering column offset to X
+            inc tempColumnAddress   ; increment the offset
+            lda columns, x          ; load block type number to A
+            asl a 
+            asl a           ; x4 (block size)
+            tax             ; copy char type address to X
+            lda blocks, x   ; load char number to A
+            ldx tempDrawAddressOffset
+            inc tempDrawAddressOffset
+            sta DRAWBUFFER, x
+            iny
+            cpy #30         ; last row
+            bcc @loop2
+        lda tempDrawAddressOffset
+        cmp #120
+        bcc @loop1
+
+    lda currentMapColumn
+    and #1
+    bne @skipColorRender
+    jmp @skipColorRender
+        lda map, x      ; load column type number to A
+        asl a
+        asl a
+        asl a
+        asl a           ; x16 (column size)
+        sta tempColumnAddress
+        ldy #0
+
+        @loop3:
+            lda #$23
+            sta PPUADDR
+            lda currentMapColumn
+            sta tempColorAddress
+            lsr tempColorAddress
+            tya
+            asl a
+            asl a
+            asl a
+            adc #$C0
+            adc tempColorAddress
+            sta PPUADDR
+            ldx tempColumnAddress
+            inc tempColumnAddress
+            inc tempColumnAddress
+            lda columns, x      ; load block type number to A
+            tax
+            lda blockColors, x  ; load block color number to X
+            ; lda #1
+            sta PPUDATA
+            iny
+            cpy #7         ; last row (should be 7, too many cycles)
+            bcc @loop3
+    @skipColorRender:
+
+    ldx currentMapColumn
+    inx         ; next column
+    cpx #16    ; over last column?
+    bcc :+
+        ldx #0  ; back to column 0
+    :
+    stx currentMapColumn
+
     rts
 
 DoDrawing:
@@ -292,7 +504,7 @@ DoDrawing:
 
     lda currentMapColumn
     and #1
-    bne skipColorRender
+    bne @skipColorRender
         lda map, x      ; load column type number to A
         asl a
         asl a
@@ -325,7 +537,7 @@ DoDrawing:
             iny
             cpy #5         ; last row (should be 7, too many cycles)
             bcc @loop3
-    skipColorRender:
+    @skipColorRender:
 
     ldx currentMapColumn
     inx         ; next column

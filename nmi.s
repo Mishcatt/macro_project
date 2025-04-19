@@ -20,7 +20,7 @@ nmi:
         lda drawflag          ; do other PPU drawing (NT/Palette/whathaveyou)
         beq @check_ppu_flag ; conditional via the 'drawflag' flag
             bit PPUSTATUS         ; clear VBl flag, reset PPUSCROLL/PPUADDR toggle
-            jsr DoDrawing     ; draw the stuff from the drawing buffer
+            jsr DoDrawing2     ; draw the stuff from the drawing buffer
             dec drawflag
 
     @check_ppu_flag:
