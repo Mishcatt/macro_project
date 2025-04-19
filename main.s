@@ -22,6 +22,8 @@ currentMapColumn: .res 1
 
 currentRenderColumn: .res 1
 currentRenderRow: .res 1
+currentRenderNametableAddress: .res 1
+tempRenderColumn: .res 1
 
 tempColumnAddress: .res 1
 tempColorAddress: .res 1
@@ -208,8 +210,19 @@ noLeftButton:
         :
 noRightButton:
 
-    ;jsr PrepareDrawing
-    jsr PrepareDrawingTest
+    jsr PrepareDrawing
+    ; jsr PrepareDrawingTest
+
+    lda currentRenderColumn
+    clc
+    adc #1                      ; add 1
+    and #%1111                  ; wrap around 0-15
+    sta currentRenderColumn     ; save
+    and #%1000                  ; check nametable
+    lsr a                       ; 8 >> 1 = 4
+    clc
+    adc #$20                     ; nametable0 = $20, nametable1 = $24
+    sta currentRenderNametableAddress
 
     inc ppuflag
     inc drawflag
@@ -250,14 +263,20 @@ DoDrawing2:
     ;lda #4
     ;sta drawingLoop2
 
+    lda currentRenderColumn ; 32 pixel column
+    and #%111               ; 8 columns per nametable
+    asl 
+    asl 
+    sta tempRenderColumn ; 8 pixel column
+
     ldx #0 ; start at offset 0
     ldy #0
     draw1:
-        lda #$20        ; nametable 0, TODO: nametable 1
+        lda currentRenderNametableAddress
         sta PPUADDR
         tya
         clc
-        adc currentRenderColumn
+        adc tempRenderColumn
         sta PPUADDR
         lda DRAWBUFFER + 0, x   ; 5 cycles
         sta PPUDATA             ; 4 cycles
@@ -328,14 +347,14 @@ DoDrawing2:
         jmp draw1
     draw1end:
 
-    lda currentRenderColumn
-    clc
-    adc #4
-    cmp #32     ; over last column?
-    bcc :+
-        lda #0  ; back to column 0
-    :
-    sta currentRenderColumn
+    ; lda currentRenderColumn
+    ; clc
+    ; adc #4
+    ; cmp #32     ; over last column?
+    ; bcc :+
+    ;     lda #0  ; back to column 0
+    ; :
+    ; sta currentRenderColumn
 
     rts
 
@@ -375,8 +394,10 @@ PrepareDrawing:
             tax             ; copy char type address to X
             lda blocks, x   ; load char number to A
             ldx tempDrawAddressOffset
-            inc tempDrawAddressOffset
             sta DRAWBUFFER, x
+            inx
+            sta DRAWBUFFER, x
+            stx tempDrawAddressOffset
             iny
             cpy #30         ; last row
             bcc @loop2
@@ -406,6 +427,7 @@ PrepareDrawing:
             asl a
             asl a
             asl a
+            clc
             adc #$C0
             adc tempColorAddress
             sta PPUADDR
