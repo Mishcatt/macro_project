@@ -43,7 +43,9 @@
     temp2a: .res 1
     temp3: .res 1
     temp3a: .res 1
+    temp3b: .res 1
     temp4: .res 1
+    temp4a: .res 1
 
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier

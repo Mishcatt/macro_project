@@ -234,25 +234,43 @@ PrepareColors:
     sta temp2 ; first 16px map table element
 
     @drawing3:
-        lda temp2
-        ora temp2a ; add map offset (which half of 32px)
-        tax
-        lda map, x
+
+        ldx temp2
+        lda map, x ; first half of 32px column
         asl
         asl
         asl
         asl ; x16
-        sta temp3 ; first 16x16 column table element
+        sta temp3 ; first 16x16 column table element of map 0
+
+        ldx temp2
+        inx
+        lda map, x ; second half of 32px column
+        asl
+        asl
+        asl
+        asl ; x16
+        sta temp3b ; first 16x16 column table element of map 1
+
         lda #0
         tay
         sta temp3a
+        inc temp3a
 
         @drawing2A:
             lda temp3
             clc
             adc temp3a ; add column offset
             tax
-            inc temp3a ; 0 ... 15
+            ;inc temp3a ; 0 ... 15
+            lda columns, x
+            sta temp4a ; block number
+
+            lda temp3b
+            clc
+            adc temp3a ; add column offset
+            tax
+            dec temp3a ; 0 ... 15
             lda columns, x
             sta temp4 ; block number
 
@@ -262,13 +280,28 @@ PrepareColors:
                 asl
                 asl ; move color bits 2 left
                 ora blockColors, x
+
+                ldx temp4a
+                asl
+                asl ; move color bits 2 left
+                ora blockColors, x
                 sta COLORBUFFER, y
             
             lda temp3
             clc
             adc temp3a ; add column offset
             tax
-            inc temp3a ; 0 ... 15
+            ; inc temp3a ; 0 ... 15
+            lda columns, x
+            sta temp4a ; block number
+
+            lda temp3b
+            clc
+            adc temp3a ; add column offset
+            tax
+            inc temp3a
+            inc temp3a
+            inc temp3a
             lda columns, x
             sta temp4 ; block number
 
@@ -278,16 +311,21 @@ PrepareColors:
                 asl
                 asl ; move color bits 2 left
                 ora blockColors, x
+
+                ldx temp4a
+                asl
+                asl
+                ora blockColors, x
                 sta COLORBUFFER, y
                 iny
             
             lda temp3a
-            cmp #15
+            cmp #14
             bcc @drawing2A
         
-        inc temp2a ; 0 1
-        lda temp2a
-        cmp #2
-        bcc @drawing3
+        ; inc temp2a ; 0 1
+        ; lda temp2a
+        ; cmp #2
+        ; bcc @drawing3
 
     rts
