@@ -23,9 +23,10 @@
     currentMapColumn: .res 1
 
     currentRenderColumn: .res 1
+    tempRenderColumn: .res 1
     currentRenderRow: .res 1
     currentRenderNametableAddress: .res 1
-    tempRenderColumn: .res 1
+    tempRenderNametableAddress: .res 1
 
     currentDrawingColumn: .res 1
 
@@ -166,6 +167,7 @@ main_loop:
 
     jsr PrepareDrawing
     ; jsr PrepareDrawingTest
+    jsr PrepareColors
 
     ; lda currentRenderColumn
     lda currentDrawingColumn

@@ -12,12 +12,13 @@ DoDrawing:
     ldx #0 ; start at offset 0
     ldy #0
     draw1:
-        lda currentRenderNametableAddress
+        lda currentRenderNametableAddress ; $20/$24
         sta PPUADDR
         tya
         clc
         adc tempRenderColumn
         sta PPUADDR
+
         lda DRAWBUFFER + 0, x   ; 5 cycles
         sta PPUDATA             ; 4 cycles
         lda DRAWBUFFER + 1, x
@@ -78,6 +79,7 @@ DoDrawing:
         sta PPUDATA
         lda DRAWBUFFER + 29, x
         sta PPUDATA
+
         txa
         adc #30 ; add offset 30 to DRAWBUFFER
         tax
@@ -86,6 +88,41 @@ DoDrawing:
         beq draw1end
         jmp draw1
     draw1end:
+
+    lda #%10000000  ; Enable NMI and horizontal increment
+    sta PPUCTRL
+    bit PPUSTATUS   ; clear w register by reading Status
+
+    lda currentRenderColumn ; 32 pixel column
+    and #%111               ; 
+    clc
+    adc #$C0                ; beginning of color data
+    sta tempRenderColumn    ; 1 color column, C0 - C7
+
+    lda currentRenderNametableAddress ; $20/$24
+    clc
+    adc #3 ; $23/$27
+    sta tempRenderNametableAddress
+
+    ldy #0
+    color1:
+        lda tempRenderNametableAddress
+        sta PPUADDR
+        lda tempRenderColumn
+        sta PPUADDR
+        clc
+        adc #8
+        sta tempRenderColumn
+
+        lda COLORBUFFER, y
+        sta PPUDATA
+
+        iny
+        cpy #7
+        beq color1end
+        jmp color1
+
+    color1end:
 
     rts
 
@@ -114,7 +151,7 @@ PrepareDrawing:
         asl
         asl
         asl
-        asl
+        asl ; x16
         sta temp3
         lda #0
         sta temp3a
@@ -152,7 +189,7 @@ PrepareDrawing:
         asl
         asl
         asl
-        asl
+        asl ; x16
         sta temp3
         lda #0
         sta temp3a
@@ -190,5 +227,41 @@ PrepareDrawing:
     rts
 
 PrepareColors:
+    ldy #0
+    lda currentDrawingColumn
+    asl
+    sta temp2
+
+    @drawing3:
+        lda temp2
+        tax
+        lda map, x
+        asl
+        asl
+        asl
+        asl ; x16
+        sta temp3
+        lda #0
+        sta temp3a
+
+        @drawing2A:
+            lda temp3
+            clc
+            adc temp3a ; add column offset
+            tax
+            inc temp3a ; 
+            inc temp3a ; 0 2 4 6 8 10 12 14
+            lda columns, x
+            sta temp4
+
+            @drawing1A:
+                ldx temp4  ; 0 1
+                lda blockColors, x
+                sta COLORBUFFER, y
+                iny
+
+            lda temp3a
+            cmp #16
+            bcc @drawing2A
 
     rts

@@ -70,6 +70,7 @@ stateGamePlaying:
             lda currentCenter
             clc 
             sbc #4
+            and #%01111111 ; only 0-127
             sta currentDrawingColumn
         :
     noLeftButton:
@@ -89,6 +90,7 @@ stateGamePlaying:
                 lda currentCenter
                 clc 
                 adc #4
+                and #%01111111 ; only 0-127
                 sta currentDrawingColumn
             :
     noRightButton:
