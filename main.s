@@ -2,46 +2,47 @@
 .include "const.s"
 
 .zeropage
-buttons:    .res 2
+    buttons:    .res 2
 
-currentState: .res 1
+    currentState: .res 1
+    tempAddr: .res 2
+    stateTemp1: .res 1
 
-softPPUCTRL:   .res 1
-softPPUMASK:   .res 1
+    softPPUCTRL:   .res 1
+    softPPUMASK:   .res 1
 
-dmaflag:    .res 1
-drawflag:   .res 1
-ppuflag:    .res 1
-nmiflag:   .res 1
+    dmaflag:    .res 1
+    drawflag:   .res 1
+    ppuflag:    .res 1
+    nmiflag:   .res 1
 
-xscroll:    .res 1
-yscroll:    .res 1
+    xscroll:    .res 1
+    yscroll:    .res 1
 
-currentCenter: .res 1
-currentMapColumn: .res 1
+    currentCenter: .res 1
+    currentMapColumn: .res 1
 
-currentRenderColumn: .res 1
-currentRenderRow: .res 1
-currentRenderNametableAddress: .res 1
-tempRenderColumn: .res 1
+    currentRenderColumn: .res 1
+    currentRenderRow: .res 1
+    currentRenderNametableAddress: .res 1
+    tempRenderColumn: .res 1
 
-tempColumnAddress: .res 1
-tempColorAddress: .res 1
-tempMapAddress: .res 1
-tempDrawAddressOffset: .res 1
+    currentDrawingColumn: .res 1
 
-drawingLoop1: .res 1
-drawingLoop2: .res 1
+    tempColumnAddress: .res 1
+    tempColorAddress: .res 1
+    tempMapAddress: .res 1
+    tempDrawAddressOffset: .res 1
 
-temp1: .res 1
-temp2: .res 1
-temp2a: .res 1
-temp3: .res 1
-temp3a: .res 1
-temp4: .res 1
+    drawingLoop1: .res 1
+    drawingLoop2: .res 1
 
-;leftRenderColumn: .res 30
-;rightRenderColumn: .res 30
+    temp1: .res 1
+    temp2: .res 1
+    temp2a: .res 1
+    temp3: .res 1
+    temp3a: .res 1
+    temp4: .res 1
 
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
@@ -114,21 +115,6 @@ load_palettes:
         cpx #$20
         bne @loop
 
-enable_rendering:
-    lda #%10000100	; Enable NMI and vertical increment
-    sta PPUCTRL
-    sta softPPUCTRL
-    lda #%00011010	; Enable Sprites and Background
-    sta PPUMASK
-    sta softPPUMASK
-    ; inc drawflag
-
-set_scroll:
-    lda #$00
-    sta xscroll
-    sta yscroll
-    ; inc ppuflag
-
 load_initial_sprites:
     ldx #$00
     @loop:
@@ -139,15 +125,31 @@ load_initial_sprites:
         bne @loop
     ; inc dmaflag
 
+set_scroll:
+    lda #$00
+    sta xscroll
+    sta yscroll
+    ; inc ppuflag
+
+enable_rendering:
+    lda #%10000100	; Enable NMI and vertical increment
+    sta PPUCTRL
+    sta softPPUCTRL
+    lda #%00011010	; Enable Sprites and Background
+    sta PPUMASK
+    sta softPPUMASK
+    ; inc drawflag
+
+initial_variables:
+    lda #InitialState
+    sta currentState
+
 main_loop:
     lda nmiflag
     beq main_loop   ; wait for nmi_flag
     dec nmiflag
 
     jsr readjoyx2   ; read two gamepads
-
-    ; inc xscroll
-    ; inc yscroll
 
     ldx #Sprites::Sprite2y
     inc OAM, x
@@ -195,31 +197,44 @@ main_loop:
         bne :+
             dec currentCenter
         :
-noLeftButton:
-    lda buttons1
-    and #BUTTON_RIGHT
-    beq noRightButton
-        inc xscroll
-        bne :+
-            lda softPPUCTRL
-            eor #%00000001 ; swap nametable 0 and 1
-            sta softPPUCTRL
-        :
-        lda xscroll
-        and #%11110000
-        bne :+
-            inc currentCenter
-        :
-noRightButton:
+    noLeftButton:
+        lda buttons1
+        and #BUTTON_RIGHT
+        beq noRightButton
+            inc xscroll
+            bne :+
+                lda softPPUCTRL
+                eor #%00000001 ; swap nametable 0 and 1
+                sta softPPUCTRL
+            :
+            lda xscroll
+            and #%11110000
+            bne :+
+                inc currentCenter
+            :
+    noRightButton:
+
+    stateMachine:
+        lda currentState
+        asl ; x2 
+        tax
+        lda JumpTable, x        ; Low byte
+        sta tempAddr
+        lda JumpTable+1, x      ; High byte
+        sta tempAddr+1
+        jmp (tempAddr)          ; Jump to the handler
+    stateMachineEnd:
 
     jsr PrepareDrawing
     ; jsr PrepareDrawingTest
 
-    lda currentRenderColumn
-    clc
-    adc #1                      ; add 1
+    ; lda currentRenderColumn
+    lda currentDrawingColumn
+    ; clc
+    ; adc #1                      ; add 1
     and #%1111                  ; wrap around 0-15
     sta currentRenderColumn     ; save
+    ; sta currentDrawingColumn
     and #%1000                  ; check nametable
     lsr a                       ; 8 >> 1 = 4
     clc
@@ -231,26 +246,8 @@ noRightButton:
     inc dmaflag
     jmp main_loop
 
-readjoyx2:
-    ldx #$00
-    jsr readjoyx    ; X=0: read controller 1
-    inx
-    ; fall through to readjoyx below, X=1: read controller 2
-
-readjoyx:           ; X register = 0 for controller 1, 1 for controller 2
-    lda #$01
-    sta JOYPAD1
-    sta buttons, x
-    lsr a
-    sta JOYPAD1
-@loop:
-    lda JOYPAD1, x
-    and #%00000011  ; ignore bits other than controller
-    cmp #$01        ; Set carry if and only if nonzero
-    rol buttons, x  ; Carry -> bit 0; but 7 -> Carry
-    bcc @loop
-    rts
-
+.include "statemachine.s"
+.include "joypad.s"
 .include "drawing.s"
 
 MusicEngine:

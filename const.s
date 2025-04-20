@@ -1,5 +1,8 @@
-DRAWBUFFER := $0100  ; Beginning of Drawing Buffer
-OAM        := $0200  ; Beginning of OAM Shadow buffer
+DRAWBUFFER  := $0100  ; Beginning of Drawing Buffer
+COLORBUFFER := $0178  ; Beginning of Color Buffer
+OAM         := $0200  ; Beginning of OAM Shadow buffer
+
+InitialState := 2
 
 .enum Sprites
     Sprite0y = 0
@@ -43,9 +46,12 @@ OAM        := $0200  ; Beginning of OAM Shadow buffer
 buttons1 = buttons
 buttons2 = buttons + 1
 
-.enum  States
-    MainMenu        = 0
-    file_error      = 1
-    parse_error     = 2
+.enum  GameStates
+    GameInit = 0
+    GameMenu
+    GameStart
+    GamePlaying
+    GameFinish
+    GameOver
 .endenum
 

@@ -95,14 +95,14 @@ PrepareDrawingTest:
         lda #1   ; load char number to A
         sta DRAWBUFFER, y
         iny
-        cpy #120         ; last row
+        cpy #120 ; last buffer byte
         bcc @loop2
     rts
 
 PrepareDrawing:
     ldy #0
     sty temp2a
-    lda currentRenderColumn
+    lda currentDrawingColumn
     asl
     sta temp2
 
@@ -187,4 +187,8 @@ PrepareDrawing:
         lda temp2a
         cmp #2
         bcc @drawing3
+    rts
+
+PrepareColors:
+
     rts
