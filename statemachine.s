@@ -63,8 +63,9 @@ stateGamePlaying:
             sta softPPUCTRL
         :
         lda xscroll
-        and #%00011111 ; check if crossing column boundary
-        bne :+
+        and #%00011111  ; check if crossing column boundary
+        cmp #%00011111  ; check for 31
+        bne :+          
             dec currentCenter
             lda currentCenter
             clc 
@@ -82,8 +83,8 @@ stateGamePlaying:
                 sta softPPUCTRL
             :
             lda xscroll
-            and #%00011111 ; check if crossing column boundary
-            bne :+
+            and #%00011111  ; check if crossing column boundary
+            bne :+          ; check for 0
                 inc currentCenter
                 lda currentCenter
                 clc 
