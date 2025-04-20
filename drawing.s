@@ -228,20 +228,23 @@ PrepareDrawing:
 
 PrepareColors:
     ldy #0
-    lda currentDrawingColumn
+    sty temp2a
+    lda currentDrawingColumn ; 32px column
     asl
-    sta temp2
+    sta temp2 ; first 16px map table element
 
     @drawing3:
         lda temp2
+        ora temp2a ; add map offset (which half of 32px)
         tax
         lda map, x
         asl
         asl
         asl
         asl ; x16
-        sta temp3
+        sta temp3 ; first 16x16 column table element
         lda #0
+        tay
         sta temp3a
 
         @drawing2A:
@@ -249,19 +252,42 @@ PrepareColors:
             clc
             adc temp3a ; add column offset
             tax
-            inc temp3a ; 
-            inc temp3a ; 0 2 4 6 8 10 12 14
+            inc temp3a ; 0 ... 15
             lda columns, x
-            sta temp4
+            sta temp4 ; block number
 
             @drawing1A:
-                ldx temp4  ; 0 1
-                lda blockColors, x
+                ldx temp4
+                lda COLORBUFFER, y
+                asl
+                asl ; move color bits 2 left
+                ora blockColors, x
+                sta COLORBUFFER, y
+            
+            lda temp3
+            clc
+            adc temp3a ; add column offset
+            tax
+            inc temp3a ; 0 ... 15
+            lda columns, x
+            sta temp4 ; block number
+
+            @drawing1B:
+                ldx temp4
+                lda COLORBUFFER, y
+                asl
+                asl ; move color bits 2 left
+                ora blockColors, x
                 sta COLORBUFFER, y
                 iny
-
+            
             lda temp3a
-            cmp #16
+            cmp #15
             bcc @drawing2A
+        
+        inc temp2a ; 0 1
+        lda temp2a
+        cmp #2
+        bcc @drawing3
 
     rts

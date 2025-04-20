@@ -27,8 +27,8 @@ blocks: ; 4 chars (8x8) = 1 block (16x16)
     .byte $02, $02, $02, $02 ; water
     .byte $03, $03, $03, $03 ; city
 
-blockColors: ; 1 pallete index per macroblock (32x32)
+blockColors: ; 1 pallete index per macroblock (32x32), 4 palettes max
     .byte $00
-    .byte $55
-    .byte $AA
-    .byte $FF
+    .byte $01
+    .byte $02
+    .byte $03
