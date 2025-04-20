@@ -3,6 +3,7 @@ COLORBUFFER := $0178  ; Beginning of Color Buffer
 OAM         := $0200  ; Beginning of OAM Shadow buffer
 
 InitialState := 2
+InitialCenter := 4
 
 .enum Sprites
     Sprite0y = 0

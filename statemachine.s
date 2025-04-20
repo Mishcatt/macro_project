@@ -21,7 +21,76 @@ stateGameStart:
     jmp stateMachineEnd
 
 stateGamePlaying:
+    ldx #Sprites::Sprite2y
+    inc OAM, x
+    ldx #Sprites::Sprite2x
+    inc OAM, x
+    ldx #Sprites::Sprite3y
+    dec OAM, x
+    ldx #Sprites::Sprite3x
+    dec OAM, x
+    ldx #Sprites::Sprite4y
+    inc OAM, x
+    ldx #Sprites::Sprite4x
+    dec OAM, x
+    ldx #Sprites::Sprite5y
+    dec OAM, x
+    ldx #Sprites::Sprite5x
+    inc OAM, x
 
+    ldx #Sprites::Sprite6y
+    lda buttons1
+    and #BUTTON_UP
+    beq :+
+        dec OAM, x
+    :
+    lda buttons1
+    and #BUTTON_DOWN
+    beq :+
+        inc OAM, x
+    :
+
+    ; ldx #Sprites::Sprite6x
+    lda buttons1
+    and #BUTTON_LEFT
+    beq noLeftButton
+        dec xscroll
+        lda xscroll
+        cmp #$FF
+        bne :+
+            lda softPPUCTRL
+            eor #%00000001 ; swap nametable 0 and 1
+            sta softPPUCTRL
+        :
+        lda xscroll
+        and #%00011111 ; check if crossing column boundary
+        bne :+
+            dec currentCenter
+            lda currentCenter
+            clc 
+            sbc #4
+            sta currentDrawingColumn
+        :
+    noLeftButton:
+        lda buttons1
+        and #BUTTON_RIGHT
+        beq noRightButton
+            inc xscroll
+            bne :+
+                lda softPPUCTRL
+                eor #%00000001 ; swap nametable 0 and 1
+                sta softPPUCTRL
+            :
+            lda xscroll
+            and #%00011111 ; check if crossing column boundary
+            bne :+
+                inc currentCenter
+                lda currentCenter
+                clc 
+                adc #4
+                sta currentDrawingColumn
+            :
+    noRightButton:
     jmp stateMachineEnd
 
 stateGameFinish:
