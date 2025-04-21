@@ -203,4 +203,4 @@ MusicEngine:
 
 ; Character memory
 .segment "CHARS"
-    .incbin "macro.chr", 0, 4096
+    .incbin "macro.chr", 0, 8192
