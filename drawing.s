@@ -322,10 +322,5 @@ PrepareColors:
             lda temp3a
             cmp #14
             bcc @drawing2A
-        
-        ; inc temp2a ; 0 1
-        ; lda temp2a
-        ; cmp #2
-        ; bcc @drawing3
 
     rts

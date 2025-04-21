@@ -7,6 +7,6 @@ palettes:
 
     ; Sprite Palette
     .byte $0F, $24, $33, $37
-    .byte $0f, $00, $00, $00
+    .byte $0F, $11, $20, $27 
     .byte $0f, $00, $00, $00
     .byte $0f, $00, $00, $00

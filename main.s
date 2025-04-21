@@ -200,4 +200,7 @@ MusicEngine:
 .include "maps.s"
 .include "sprites.s"
 .include "palettes.s"
-.include "chars.s"
+
+; Character memory
+.segment "CHARS"
+    .incbin "macro.chr", 0, 4096
