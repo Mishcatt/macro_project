@@ -6,7 +6,7 @@ palettes:
     .byte $0F, $24, $33, $37
 
     ; Sprite Palette
-    .byte $0F, $24, $33, $37
-    .byte $0F, $11, $20, $27 
+    .byte $0F, $24, $33, $37 ; pink, lilac, beige
+    .byte $0F, $11, $20, $27 ; blue, lighter_gray, orange
     .byte $0f, $00, $00, $00
     .byte $0f, $00, $00, $00

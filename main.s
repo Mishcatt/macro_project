@@ -19,6 +19,10 @@
     xscroll:    .res 1
     yscroll:    .res 1
 
+    playerX: .res 1
+    playerY: .res 1
+    playerMaxY: .res 1
+
     currentCenter: .res 1
     currentMapColumn: .res 1
 

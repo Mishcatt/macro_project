@@ -18,6 +18,11 @@ stateGameStart:
     sta currentDrawingColumn
     lda #GameStates::GamePlaying
     sta currentState
+
+    lda #167
+    sta playerMaxY ; set ground level
+    sta playerY
+
     jmp stateMachineEnd
 
 stateGamePlaying:
@@ -38,19 +43,28 @@ stateGamePlaying:
     ldx #Sprites::Sprite5x
     inc OAM, x
 
+    lda #167
+    sta playerMaxY ; set ground level
     
     lda buttons1
     and #BUTTON_UP
-    beq :+
-        ldx #Sprites::Sprite6y
-        dec OAM, x
+    beq :+ 
+        lda playerY
+        beq :+
+            dec playerY
     :
     lda buttons1
     and #BUTTON_DOWN
     beq :+
-        ldx #Sprites::Sprite6y
-        inc OAM, x
+        lda playerY
+        cmp playerMaxY ; check for ground
+        bcs :+
+            inc playerY
     :
+
+    lda playerY
+    ldx #Sprites::Sprite6y
+    sta OAM, x
 
     ; ldx #Sprites::Sprite6x
     lda buttons1
