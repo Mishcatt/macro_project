@@ -104,7 +104,7 @@ vblankwait2:
     bpl vblankwait2
 
 load_palettes:
-    lda PPUSTATUS ; clear w register by reading Status
+    bit PPUSTATUS ; clear w register by reading Status
     lda #$3f
     sta PPUADDR
     lda #$00
@@ -187,6 +187,23 @@ main_loop:
     inc ppuflag
     inc drawflag
     inc dmaflag
+
+vblankLoop:
+    bit PPUSTATUS  ; check for sprite 0 clear
+    bvs vblankLoop ; loop if still set (still in previous vBlank)
+
+sprite0loop:
+    bit PPUSTATUS   ; check for sprite 0 set
+    bmi skipSpriteCheck
+    bvc sprite0loop ; loop if still clear
+
+    lda #0
+    sta PPUSCROLL
+    ; bit PPUSTATUS
+    ; lda %10000000
+    ; sta PPUCTRL
+
+skipSpriteCheck:
     jmp main_loop
 
 .include "statemachine.s"

@@ -1,8 +1,8 @@
 palettes:
     ; Background Palette
     .byte $0F, $11, $16, $1A
-    .byte $0F, $1A, $11, $16
-    .byte $0F, $16, $1A, $11
+    .byte $0F, $31, $16, $3D ; sky, red, light_gray
+    .byte $0F, $09, $16, $3D ; grass, red, light_gray
     .byte $0F, $24, $33, $37
 
     ; Sprite Palette

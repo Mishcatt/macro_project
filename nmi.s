@@ -6,6 +6,7 @@ nmi:
     pha
     tya
     pha
+    bit PPUSTATUS ; reset PPUSCROLL/PPUADDR toggle
 
     @check_dma_flag:
         lda dmaflag
