@@ -1,5 +1,5 @@
 sprites:
-    .byte $D0, $00, $00, $F0 	; Sprite 0
+    .byte $CF, $31, $01, $F8 	; Sprite 0
     .byte $00, $00, $00, $00    ; Ypos, Index, Attributes, Xpos
     .byte $60, $02, $00, $60
     .byte $64, $03, $00, $70
