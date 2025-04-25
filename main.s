@@ -21,7 +21,9 @@
 
     playerX: .res 1
     playerY: .res 1
+    playerMaxYleft: .res 1
     playerMaxY: .res 1
+    playerMaxYright: .res 1
     playerObjectCollision: .res 1
 
     currentCenter: .res 1

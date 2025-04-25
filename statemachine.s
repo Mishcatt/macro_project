@@ -43,8 +43,6 @@ stateGamePlaying:
     ldx #Sprites::Sprite5x
     inc OAM, x
 
-    lda #167
-    sta playerMaxY ; set ground level
     jsr getCurrentGroundLevel
     
     lda buttons1
@@ -77,27 +75,30 @@ stateGamePlaying:
         ora #%01000000
         sta OAM, x
 
-        dec xscroll
-        lda xscroll
-        cmp #$FF
-        bne :+
-            lda softPPUCTRL
-            eor #%00000001 ; swap nametable 0 and 1
-            sta softPPUCTRL
-        :
-        lda xscroll
-        and #%00001111  ; check if crossing 16px column boundary
-        cmp #%00001111  ; check for 15
-        bne :+
-            dec currentMapColumn
-            lda currentMapColumn
-            lsr
-            sta currentCenter ; store 32px column number
-            clc 
-            sbc #4
-            and #%01111111 ; only 0-127
-            sta currentDrawingColumn
-        :
+        lda playerMaxYleft
+        cmp playerY
+        bcc noLeftButton
+            dec xscroll
+            lda xscroll
+            cmp #$FF
+            bne :+
+                lda softPPUCTRL
+                eor #%00000001 ; swap nametable 0 and 1
+                sta softPPUCTRL
+            :
+            lda xscroll
+            and #%00001111  ; check if crossing 16px column boundary
+            cmp #%00001111  ; check for 15
+            bne :+
+                dec currentMapColumn
+                lda currentMapColumn
+                lsr
+                sta currentCenter ; store 32px column number
+                clc 
+                sbc #4
+                and #%01111111 ; only 0-127
+                sta currentDrawingColumn
+            :
     noLeftButton:
     lda buttons1
     and #BUTTON_RIGHT
@@ -108,25 +109,31 @@ stateGamePlaying:
         and #%10111111
         sta OAM, x
 
-        inc xscroll
-        bne :+
-            lda softPPUCTRL
-            eor #%00000001 ; swap nametable 0 and 1
-            sta softPPUCTRL
-        :
-        lda xscroll
-        and #%00001111  ; check if crossing 16px column boundary
-        bne :+          ; check for 0
-            inc currentMapColumn
-            lda currentMapColumn
-            lsr
-            sta currentCenter ; store 32px column number
-            clc 
-            adc #4
-            and #%01111111 ; only 0-127
-            sta currentDrawingColumn
-        :
+
+        lda playerMaxYright
+        cmp playerY
+        bcc noRightButton
+
+            inc xscroll
+            bne :+
+                lda softPPUCTRL
+                eor #%00000001 ; swap nametable 0 and 1
+                sta softPPUCTRL
+            :
+            lda xscroll
+            and #%00001111  ; check if crossing 16px column boundary
+            bne :+          ; check for 0
+                inc currentMapColumn
+                lda currentMapColumn
+                lsr
+                sta currentCenter ; store 32px column number
+                clc 
+                adc #4
+                and #%01111111 ; only 0-127
+                sta currentDrawingColumn
+            :
     noRightButton:
+
     jmp stateMachineEnd
 
 stateGameFinish:
@@ -146,7 +153,42 @@ getCurrentGroundLevel:
     asl ; x16
     tax
     lda columns+15, x
+    sta playerMaxYleft
     sta playerMaxY
+    sta playerMaxYright
+
+    checkRightGroundLevel:
+        lda xscroll
+        and #%00001111  ; check if crossing 16px column boundary
+        cmp #%00001111  ; check for 15 - last pixel on right
+        bne checkLeftGroundLevel
+            ldx currentMapColumn
+            inx
+            lda map, x
+            asl
+            asl
+            asl
+            asl ; x16
+            tax
+            lda columns+15, x
+            sta playerMaxYright
+
+    checkLeftGroundLevel:
+        lda xscroll
+        and #%00001111  ; check if crossing 16px column boundary
+        bne checkGroundLevelEnd ; check for 0 - first pixel on left
+            ldx currentMapColumn
+            dex
+            lda map, x
+            asl
+            asl
+            asl
+            asl ; x16
+            tax
+            lda columns+15, x
+            sta playerMaxYleft
+
+    checkGroundLevelEnd:
     rts
 
 JumpTable:
