@@ -86,11 +86,13 @@ stateGamePlaying:
             sta softPPUCTRL
         :
         lda xscroll
-        and #%00011111  ; check if crossing column boundary
-        cmp #%00011111  ; check for 31
-        bne :+          
-            dec currentCenter
-            lda currentCenter
+        and #%00001111  ; check if crossing 16px column boundary
+        cmp #%00001111  ; check for 15
+        bne :+
+            dec currentMapColumn
+            lda currentMapColumn
+            lsr
+            sta currentCenter ; store 32px column number
             clc 
             sbc #4
             and #%01111111 ; only 0-127
@@ -113,10 +115,12 @@ stateGamePlaying:
             sta softPPUCTRL
         :
         lda xscroll
-        and #%00011111  ; check if crossing column boundary
+        and #%00001111  ; check if crossing 16px column boundary
         bne :+          ; check for 0
-            inc currentCenter
-            lda currentCenter
+            inc currentMapColumn
+            lda currentMapColumn
+            lsr
+            sta currentCenter ; store 32px column number
             clc 
             adc #4
             and #%01111111 ; only 0-127
@@ -134,7 +138,7 @@ stateGameOver:
     jmp stateMachineEnd
 
 getCurrentGroundLevel:
-    ldx currentCenter
+    ldx currentMapColumn
     lda map, x
     asl
     asl

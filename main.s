@@ -153,6 +153,8 @@ initial_variables:
     sta currentState
     lda #InitialCenter
     sta currentCenter
+    asl
+    sta currentMapColumn
 
 main_loop:
     lda nmiflag
