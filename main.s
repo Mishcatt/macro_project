@@ -207,6 +207,8 @@ sprite0loop:
 
     lda #0
     sta PPUSCROLL
+    lda #%10000000
+    sta PPUCTRL
     bit PPUSTATUS
 
 skipSpriteCheck:
