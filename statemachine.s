@@ -20,7 +20,9 @@ stateGameStart:
     sta currentState
 
     lda #167
+    sta playerMaxYleft
     sta playerMaxY ; set ground level
+    sta playerMaxYright
     sta playerY
 
     jmp stateMachineEnd
