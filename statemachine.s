@@ -45,6 +45,7 @@ stateGamePlaying:
 
     lda #167
     sta playerMaxY ; set ground level
+    jsr getCurrentGroundLevel
     
     lda buttons1
     and #BUTTON_UP
@@ -131,6 +132,18 @@ stateGameFinish:
 stateGameOver:
 
     jmp stateMachineEnd
+
+getCurrentGroundLevel:
+    ldx currentCenter
+    lda map, x
+    asl
+    asl
+    asl
+    asl ; x16
+    tax
+    lda columns+15, x
+    sta playerMaxY
+    rts
 
 JumpTable:
     .addr stateGameInit

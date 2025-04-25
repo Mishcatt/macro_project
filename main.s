@@ -22,6 +22,7 @@
     playerX: .res 1
     playerY: .res 1
     playerMaxY: .res 1
+    playerObjectCollision: .res 1
 
     currentCenter: .res 1
     currentMapColumn: .res 1
@@ -156,7 +157,6 @@ initial_variables:
 main_loop:
     lda nmiflag
     beq main_loop   ; wait for nmi_flag
-    dec nmiflag
 
     jsr readjoyx2   ; read two gamepads
 
@@ -203,11 +203,11 @@ sprite0loop:
 
     lda #0
     sta PPUSCROLL
-    ; bit PPUSTATUS
-    ; lda %10000000
-    ; sta PPUCTRL
+    bit PPUSTATUS
 
 skipSpriteCheck:
+    lda #0
+    sta nmiflag
     jmp main_loop
 
 .include "statemachine.s"
