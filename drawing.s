@@ -75,13 +75,13 @@ DoDrawing:
         sta PPUDATA
         lda DRAWBUFFER + 27, x
         sta PPUDATA
-        lda DRAWBUFFER + 28, x
-        sta PPUDATA
-        lda DRAWBUFFER + 29, x
-        sta PPUDATA
+        ; lda DRAWBUFFER + 28, x
+        ; sta PPUDATA
+        ; lda DRAWBUFFER + 29, x
+        ; sta PPUDATA
 
         txa
-        adc #30 ; add offset 30 to DRAWBUFFER
+        adc #28 ; add offset 28 to DRAWBUFFER
         tax
         iny
         cpy #4
@@ -161,7 +161,7 @@ PrepareDrawing:
             clc
             adc temp3a ; add column offset
             tax
-            inc temp3a ; 0 ... 14
+            inc temp3a ; 0 ... 13
             lda columns, x
             asl
             asl ; x4
@@ -178,7 +178,7 @@ PrepareDrawing:
                 iny
 
             lda temp3a
-            cmp #15
+            cmp #14
             bcc @drawing2A
 
         lda temp2
@@ -199,7 +199,7 @@ PrepareDrawing:
             clc
             adc temp3a ; add column offset
             tax
-            inc temp3a ; 0 ... 14
+            inc temp3a ; 0 ... 13
             lda columns, x
             asl
             asl ; x4
@@ -218,7 +218,7 @@ PrepareDrawing:
                 iny
             
             lda temp3a
-            cmp #15
+            cmp #14
             bcc @drawing2B
         
         lda temp2a
