@@ -9,9 +9,9 @@ sprites:
     .byte $D6, $0F, $00, $10 ; F
     .byte $D7, $0A, $00, $18 ; A
     .byte $D8, $16, $00, $20 ; M
-    .byte $D9, $12, $00, $28 ; I
-    .byte $DA, $0C, $00, $30 ; C
-    .byte $DB, $18, $00, $38 ; O
-    .byte $DC, $17, $00, $40 ; N
-    .byte $DE, $01, $00, $50 ; 1
-    .byte $DF, $07, $00, $58 ; 7
+    .byte $D9, $12, $00, $26 ; I
+    .byte $DA, $0C, $00, $2C ; C
+    .byte $DB, $18, $00, $34 ; O
+    .byte $DC, $17, $00, $3C ; N
+    .byte $DE, $01, $00, $46 ; 1
+    .byte $DF, $07, $00, $4C ; 7

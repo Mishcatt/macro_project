@@ -86,17 +86,18 @@ blockColors: ; 1 pallete index per macroblock (32x32), 4 palettes max
     .byte $02 ; $16 maluch_C_LOW
     .byte $02 ; $17 maluch_D_LOW
 
-maluch1HeightMapAbs:
+specialHeightMapAbs:
+maluch1HeightMapAbs: ; 1
     .byte 167, 164, 163, 162, 161, 160, 159, 158
     .byte 158, 158, 158, 158, 158, 158, 158, 158
-maluch2HeightMapAbs:
+maluch2HeightMapAbs: ; 2
     .byte 158, 158, 158, 159, 160, 161, 162, 163
     .byte 163, 163, 163, 163, 163, 163, 164, 167
 
-specialHeightMap:
-maluch1HeightMapDiff: ; $01
+specialHeightMapDiff:
+maluch1HeightMapDiff: ; 1
     .byte 0, 3, 4, 5, 6, 7, 8, 9
     .byte 9, 9, 9, 9, 9, 9, 9, 9
-maluch2HeightMapDiff: ; $02
+maluch2HeightMapDiff: ; 2
     .byte 9, 9, 9, 8, 7, 6, 5, 4
     .byte 4, 4, 4, 4, 4, 4, 3, 0

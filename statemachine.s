@@ -153,15 +153,27 @@ getCurrentGroundLevel:
     asl
     asl
     asl ; x16
+    sta temp2 ; left column address
+    sta temp3 ; center column address
+    sta temp4 ; right column address
     tax
+    
+    lda columns+14, x
+    sta temp2a ; left column special byte
+    sta temp3a ; center column special byte
+    sta temp4a ; right column special byte
+    
     lda columns+15, x
     sta playerMaxYleft
     sta playerMaxY
     sta playerMaxYright
 
+    lda xscroll 
+    and #%00001111
+    sta temp1 ; store player pixel offset in column
+
     checkRightGroundLevel:
-        lda xscroll
-        and #%00001111  ; check if crossing 16px column boundary
+        lda temp1
         cmp #%00001111  ; check for 15 - last pixel on right
         bne checkLeftGroundLevel
             ldx currentMapColumn
@@ -171,14 +183,16 @@ getCurrentGroundLevel:
             asl
             asl
             asl ; x16
+            sta temp4 ; right column address
             tax
+            lda columns+14, x
+            sta temp4a ; right column special byte
             lda columns+15, x
             sta playerMaxYright
 
     checkLeftGroundLevel:
-        lda xscroll
-        and #%00001111  ; check if crossing 16px column boundary
-        bne checkGroundLevelEnd ; check for 0 - first pixel on left
+        lda temp1
+        bne checkGroundLevelSpecial ; check for 0 - first pixel on left
             ldx currentMapColumn
             dex
             lda map, x
@@ -186,10 +200,69 @@ getCurrentGroundLevel:
             asl
             asl
             asl ; x16
+            sta temp2 ; left column address
             tax
+            lda columns+14, x
+            sta temp2a ; left column special byte
             lda columns+15, x
             sta playerMaxYleft
+    
+    checkGroundLevelSpecial:
+        lda temp3a 
+        beq checkRightGroundLevelSpecial
+            sec
+            sbc #1
+            asl
+            asl
+            asl
+            asl ; x16
+            clc
+            adc temp1 ; add pixel offset
+            tax
+            lda specialHeightMapAbs, x
+            sta playerMaxY
 
+    checkRightGroundLevelSpecial:
+        lda temp4a 
+        beq checkLeftGroundLevelSpecial
+            lda temp1
+            clc 
+            adc #1
+            and #%00001111
+            sta temp3b ; store (xscroll+1) % 15
+            lda temp4a
+            sec
+            sbc #1
+            asl
+            asl
+            asl
+            asl ; x16
+            clc
+            adc temp3b
+            tax
+            lda specialHeightMapAbs, x
+            sta playerMaxYright
+    
+    checkLeftGroundLevelSpecial:
+        lda temp2a 
+        beq checkGroundLevelEnd
+            lda temp1
+            sec 
+            sbc #1
+            and #%00001111
+            sta temp3b ; store (xscroll-1) % 15
+            lda temp2a
+            sec
+            sbc #1
+            asl
+            asl
+            asl
+            asl ; x16
+            clc
+            adc temp3b
+            tax
+            lda specialHeightMapAbs, x
+            sta playerMaxYleft
     checkGroundLevelEnd:
     rts
 
