@@ -46,97 +46,8 @@ stateGamePlaying:
     inc OAM, x
 
     jsr getCurrentGroundLevel
-    
-    lda buttons1
-    and #BUTTON_UP
-    beq :+ 
-        lda playerY
-        beq :+
-            dec playerY
-    :
-    lda buttons1
-    and #BUTTON_DOWN
-    beq :+
-        lda playerY
-        cmp playerMaxY ; check for ground
-        bcs :+
-            inc playerY
-    :
-
-    ; ldx #Sprites::Sprite6x
-    lda buttons1
-    and #BUTTON_LEFT
-    beq noLeftButton
-
-        ldx #Sprites::Sprite6Attributes
-        lda OAM, x
-        ora #%01000000
-        sta OAM, x
-
-        ldx playerMaxYleft
-        inx
-        cpx playerY
-        bcc noLeftButton
-            bne :+
-                dec playerY
-            :
-            dec xscroll
-            lda xscroll
-            cmp #$FF
-            bne :+
-                lda softPPUCTRL
-                eor #%00000001 ; swap nametable 0 and 1
-                sta softPPUCTRL
-            :
-            lda xscroll
-            and #%00001111  ; check if crossing 16px column boundary
-            cmp #%00001111  ; check for 15
-            bne :+
-                dec currentMapColumn
-                lda currentMapColumn
-                lsr
-                sta currentCenter ; store 32px column number
-                clc 
-                sbc #4
-                and #%01111111 ; only 0-127
-                sta currentDrawingColumn
-            :
-    noLeftButton:
-    lda buttons1
-    and #BUTTON_RIGHT
-    beq noRightButton
-
-        ldx #Sprites::Sprite6Attributes
-        lda OAM, x
-        and #%10111111
-        sta OAM, x
-
-        ldx playerMaxYright
-        inx
-        cpx playerY
-        bcc noRightButton
-            bne :+
-                dec playerY
-            :
-            inc xscroll
-            bne :+
-                lda softPPUCTRL
-                eor #%00000001 ; swap nametable 0 and 1
-                sta softPPUCTRL
-            :
-            lda xscroll
-            and #%00001111  ; check if crossing 16px column boundary
-            bne :+          ; check for 0
-                inc currentMapColumn
-                lda currentMapColumn
-                lsr
-                sta currentCenter ; store 32px column number
-                clc 
-                adc #4
-                and #%01111111 ; only 0-127
-                sta currentDrawingColumn
-            :
-    noRightButton:
+    jsr applyGravity
+    jsr applyControls
 
     lda playerY
     ldx #Sprites::Sprite6y
@@ -270,6 +181,121 @@ getCurrentGroundLevel:
             lda specialHeightMapAbs, x
             sta playerMaxYleft
     checkGroundLevelEnd:
+
+    rts
+
+applyControls:
+    lda buttons1
+    and #BUTTON_UP
+    beq :+ 
+        lda playerY
+        beq :+
+            dec playerY
+    :
+    lda buttons1
+    and #BUTTON_DOWN
+    beq :+
+        lda playerY
+        cmp playerMaxY ; check for ground
+        bcs :+
+            inc playerY
+    :
+
+    checkLeftButton:
+        ; ldx #Sprites::Sprite6x
+        lda buttons1
+        and #BUTTON_LEFT
+        beq checkRightButton
+
+            ldx #Sprites::Sprite6Attributes
+            lda OAM, x
+            ora #%01000000
+            sta OAM, x
+
+            ldx playerMaxYleft
+            inx
+            cpx playerY
+            bcc checkRightButton
+                bne :+
+                    dec playerY
+                :
+                dec xscroll
+                lda xscroll
+                cmp #$FF
+                bne :+
+                    lda softPPUCTRL
+                    eor #%00000001 ; swap nametable 0 and 1
+                    sta softPPUCTRL
+                :
+                lda xscroll
+                and #%00001111  ; check if crossing 16px column boundary
+                cmp #%00001111  ; check for 15
+                bne :+
+                    dec currentMapColumn
+                    lda currentMapColumn
+                    lsr
+                    sta currentCenter ; store 32px column number
+                    clc 
+                    sbc #4
+                    and #%01111111 ; only 0-127
+                    sta currentDrawingColumn
+                :
+
+    checkRightButton:
+        lda buttons1
+        and #BUTTON_RIGHT
+        beq checkAButton
+
+            ldx #Sprites::Sprite6Attributes
+            lda OAM, x
+            and #%10111111
+            sta OAM, x
+
+            ldx playerMaxYright
+            inx
+            cpx playerY
+            bcc checkAButton
+                bne :+
+                    dec playerY
+                :
+                inc xscroll
+                bne :+
+                    lda softPPUCTRL
+                    eor #%00000001 ; swap nametable 0 and 1
+                    sta softPPUCTRL
+                :
+                lda xscroll
+                and #%00001111  ; check if crossing 16px column boundary
+                bne :+          ; check for 0
+                    inc currentMapColumn
+                    lda currentMapColumn
+                    lsr
+                    sta currentCenter ; store 32px column number
+                    clc 
+                    adc #4
+                    and #%01111111 ; only 0-127
+                    sta currentDrawingColumn
+                :
+    checkAButton:
+        lda buttons1
+        and #BUTTON_A
+        beq checkAButtonRelease
+            lda playerAccelerationY
+            cmp #138
+
+    checkAButtonRelease:
+
+    checkButtonEnd:
+
+    rts
+
+applyGravity:
+    lda playerY
+    cmp playerMaxY
+    bcs :+
+        inc playerY
+    :
+
     rts
 
 JumpTable:

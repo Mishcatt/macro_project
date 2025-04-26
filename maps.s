@@ -50,7 +50,7 @@ blocks: ; 4 chars (8x8) = 1 block (16x16) [LU 1, LD 3, RU 2, RD 4]
     .byte $0c, $0c, $0c, $0c ; sky
     .byte $0d, $0d, $0d, $0d ; grass
     .byte $0e, $0e, $0e, $0e ; water
-    .byte $30, $2f, $30, $2f ; $0f frame
+    .byte $30, $2f, $30, $2f ; $0F frame
     .byte $70, $80, $71, $81 ; $10 maluch_A
     .byte $72, $82, $73, $83 ; $11 maluch_B
     .byte $90, $73, $91, $73 ; $12 maluch_C
@@ -77,7 +77,7 @@ blockColors: ; 1 pallete index per macroblock (32x32), 4 palettes max
     .byte $00
     .byte $01
     .byte $02
-    .byte $03
+    .byte $00 ; $0F frame
     .byte $01 ; $10 maluch_A
     .byte $01 ; $11 maluch_B
     .byte $02 ; $12 maluch_C

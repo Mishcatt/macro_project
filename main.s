@@ -25,6 +25,8 @@
     playerMaxY: .res 1
     playerMaxYright: .res 1
     playerObjectCollision: .res 1
+    playerAccelerationY: .res 1
+    playerAccelerationX: .res 1
 
     currentCenter: .res 1
     currentMapColumn: .res 1
