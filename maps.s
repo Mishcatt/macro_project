@@ -1,5 +1,5 @@
 map: ; 16 columns = 1 screen
-    .byte $00, $06, $07, $01, $01, $08, $09, $00, $00, $02, $03, $00, $06, $09, $06, $07 ; field
+    .byte $00, $06, $07, $01, $01, $08, $09, $00, $00, $02, $03, $0A, $06, $09, $06, $07 ; field
     .byte $01, $08, $07, $08, $09, $00, $06, $07, $01, $01, $01, $08, $09, $00, $00, $00 ; rural
     .byte $02, $03, $00, $00, $02, $03, $00, $00, $02, $03, $00, $00, $02, $03, $00, $00 ; farm
     .byte $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03 ; silo
@@ -27,7 +27,7 @@ columns: ; 14 blocks = 1 column, 1 byte special, 1 byte ground level
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $01, $01, $0f, $06, 167 ; $07 upslope_high
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $05, $01, $01, $0f, $08, 167 ; $08 downslope_high
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $04, $01, $01, $0f, $07, 167 ; $09 downslope_low
-    .byte $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0f, $00, 167 ; $0A house
+    .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $18, $01, $01, $0f, $00, 156 ; $0A neptun
     .byte $0b, $0b, $0b, $0b, $0b, $0b, $0b, $0b, $0b, $0b, $0b, $0b, $0b, $0f, $00, 167 ; $0B house
     .byte $0c, $0c, $0c, $0c, $0c, $0c, $0c, $0c, $0c, $0c, $0c, $0c, $0c, $0f, $00, 167 ; $0C house
     .byte $0d, $0d, $0d, $0d, $0d, $0d, $0d, $0d, $0d, $0d, $0d, $0d, $0d, $0f, $00, 167 ; $0D house
@@ -59,6 +59,7 @@ blocks: ; 4 chars (8x8) = 1 block (16x16) [LU 1, LD 3, RU 2, RD 4]
     .byte $76, $86, $77, $87 ; $15 maluch_B_LOW
     .byte $94, $73, $95, $73 ; $16 maluch_C_LOW
     .byte $96, $73, $97, $73 ; $17 maluch_D_LOW
+    .byte $78, $88, $79, $89 ; $18 neptun
 
 blockColors: ; 1 pallete index per macroblock (32x32), 4 palettes max
     .byte $01 ; $00 sky
@@ -85,6 +86,7 @@ blockColors: ; 1 pallete index per macroblock (32x32), 4 palettes max
     .byte $01 ; $15 maluch_B_LOW
     .byte $02 ; $16 maluch_C_LOW
     .byte $02 ; $17 maluch_D_LOW
+    .byte $00 ; $18 neptun
 
 specialHeightMapAbs:
 maluch1HeightMapAbs: ; 1
