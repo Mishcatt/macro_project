@@ -63,10 +63,6 @@ stateGamePlaying:
             inc playerY
     :
 
-    lda playerY
-    ldx #Sprites::Sprite6y
-    sta OAM, x
-
     ; ldx #Sprites::Sprite6x
     lda buttons1
     and #BUTTON_LEFT
@@ -77,9 +73,13 @@ stateGamePlaying:
         ora #%01000000
         sta OAM, x
 
-        lda playerMaxYleft
-        cmp playerY
+        ldx playerMaxYleft
+        inx
+        cpx playerY
         bcc noLeftButton
+            bne :+
+                dec playerY
+            :
             dec xscroll
             lda xscroll
             cmp #$FF
@@ -111,11 +111,13 @@ stateGamePlaying:
         and #%10111111
         sta OAM, x
 
-
-        lda playerMaxYright
-        cmp playerY
+        ldx playerMaxYright
+        inx
+        cpx playerY
         bcc noRightButton
-
+            bne :+
+                dec playerY
+            :
             inc xscroll
             bne :+
                 lda softPPUCTRL
@@ -135,6 +137,10 @@ stateGamePlaying:
                 sta currentDrawingColumn
             :
     noRightButton:
+
+    lda playerY
+    ldx #Sprites::Sprite6y
+    sta OAM, x ; store player sprite Y position
 
     jmp stateMachineEnd
 
