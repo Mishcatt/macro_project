@@ -1,10 +1,10 @@
 sprites:
     .byte $CF, $30, $01, $F8 	; Sprite 0
     .byte $00, $00, $00, $00    ; Ypos, Index, Attributes, Xpos
-    .byte $60, $02, $00, $60
-    .byte $64, $03, $00, $70
-    .byte $68, $04, $00, $80
-    .byte $6C, $06, $00, $90
+    .byte $60, $7A, $00, $60
+    .byte $64, $7B, $00, $70
+    .byte $68, $8A, $02, $80
+    .byte $6C, $8B, $03, $90
     .byte 0, $40, $01, 124
     .byte $D6, $0F, $00, $10 ; F
     .byte $D7, $0A, $00, $18 ; A
