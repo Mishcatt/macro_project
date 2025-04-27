@@ -280,8 +280,13 @@ applyControls:
         lda buttons1
         and #BUTTON_A
         beq checkAButtonRelease
-            lda playerAccelerationY
-            cmp #138
+            lda playerY
+            cmp playerMaxY
+            bne :+
+                lda #jumpVelocity
+                sta playerVelocityY
+                dec playerY
+            :
 
     checkAButtonRelease:
 
@@ -292,11 +297,26 @@ applyControls:
 applyGravity:
     lda playerY
     cmp playerMaxY
-    bcs :+
-        inc playerY
-    :
+    bcs applyGravityEnd
+        lda playerVelocityY
+        clc
+        adc #gravityValue
+        sta playerVelocityY
 
-    rts
+        lda playerY
+        clc
+        adc playerVelocityY
+        cmp playerMaxY
+        bcc :+
+            lda playerMaxY
+        :
+        sta playerY
+        rts
+
+    applyGravityEnd:
+        lda #0
+        sta playerVelocityY 
+        rts
 
 JumpTable:
     .addr stateGameInit
