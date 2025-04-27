@@ -302,10 +302,18 @@ applyGravity:
         clc
         adc #gravityValue
         sta playerVelocityY
+        and #%10000000
+        sta temp1 ; store sign value
+        lda playerVelocityY
+        lsr
+        ora temp1
+        lsr ; /4
+        ora temp1 ; restore sign
+        sta playerTempVelocityY
 
         lda playerY
         clc
-        adc playerVelocityY
+        adc playerTempVelocityY
         cmp playerMaxY
         bcc :+
             lda playerMaxY
@@ -315,7 +323,8 @@ applyGravity:
 
     applyGravityEnd:
         lda #0
-        sta playerVelocityY 
+        sta playerVelocityY
+        sta playerTempVelocityY
         rts
 
 JumpTable:

@@ -25,8 +25,10 @@
     playerMaxY: .res 1
     playerMaxYright: .res 1
     playerObjectCollision: .res 1
-    playerVelocityY: .res 1
+    playerVelocityY: .res 1 ; used vor gravity calculation
+    playerTempVelocityY: .res 1 ; used for player position
     playerVelocityX: .res 1
+    playerTempVelocityX: .res 1
 
     currentCenter: .res 1
     currentMapColumn: .res 1
