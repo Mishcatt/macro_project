@@ -14,7 +14,7 @@
     dmaflag:    .res 1
     drawflag:   .res 1
     ppuflag:    .res 1
-    nmiflag:   .res 1
+    nmiflag:    .res 1
 
     xscroll:    .res 1
     yscroll:    .res 1
@@ -24,14 +24,19 @@
     playerMaxYleft: .res 1
     playerMaxY: .res 1
     playerMaxYright: .res 1
-    playerObjectCollision: .res 1
+    playerGroundCollision: .res 1
+    playerPreviousCollision: .res 1
     playerVelocityY: .res 1 ; used vor gravity calculation
     playerTempVelocityY: .res 1 ; used for player position
     playerVelocityX: .res 1
     playerTempVelocityX: .res 1
+    playerWeight: .res 1 ; 0 light, 1 medium, 2 heavy
 
     currentCenter: .res 1
     currentMapColumn: .res 1
+    currentColumnDestructible: .res 1
+    currentColumnDestructionOffset: .res 1
+    lastCollisionColumn: .res 1
 
     currentRenderColumn: .res 1
     tempRenderColumn: .res 1
@@ -179,9 +184,12 @@ main_loop:
         jmp (tempAddr)          ; Jump to the handler
     stateMachineEnd:
 
-    jsr PrepareDrawing
-    ; jsr PrepareDrawingTest
-    jsr PrepareColors
+    lda drawflag
+    beq :+ ; draw only when flag set
+        jsr PrepareDrawing
+        ; jsr PrepareDrawingTest
+        jsr PrepareColors
+    :
 
     ; lda currentRenderColumn
     lda currentDrawingColumn
@@ -196,29 +204,30 @@ main_loop:
     adc #$20                     ; nametable0 = $20, nametable1 = $24
     sta currentRenderNametableAddress
 
-    inc ppuflag
-    inc drawflag
-    inc dmaflag
+    lda #1
+    sta ppuflag
+    ; sta drawflag
+    sta dmaflag
 
-vblankLoop:
-    bit PPUSTATUS  ; check for sprite 0 clear
-    bvs vblankLoop ; loop if still set (still in previous vBlank)
+    vblankLoop:
+        bit PPUSTATUS  ; check for sprite 0 clear
+        bvs vblankLoop ; loop if still set (still in previous vBlank)
 
-sprite0loop:
-    bit PPUSTATUS   ; check for sprite 0 set
-    bmi skipSpriteCheck
-    bvc sprite0loop ; loop if still clear
+    sprite0loop:
+        bit PPUSTATUS   ; check for sprite 0 set
+        bmi skipSpriteCheck
+        bvc sprite0loop ; loop if still clear
 
-    lda #0
-    sta PPUSCROLL
-    lda #%10000000
-    sta PPUCTRL
-    bit PPUSTATUS
+        lda #0
+        sta PPUSCROLL
+        lda #%10000000
+        sta PPUCTRL
+        bit PPUSTATUS
 
-skipSpriteCheck:
-    lda #0
-    sta nmiflag
-    jmp main_loop
+    skipSpriteCheck:
+        lda #0
+        sta nmiflag
+        jmp main_loop
 
 .include "statemachine.s"
 .include "joypad.s"

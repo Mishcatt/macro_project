@@ -4,6 +4,7 @@ OAM         := $0200  ; Beginning of OAM Shadow buffer
 
 InitialState := 2
 InitialCenter := 4
+InitialPlayerWeight := 1
 
 gravityValue := 1
 jumpVelocity := $F8 ; -8

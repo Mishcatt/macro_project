@@ -11,18 +11,19 @@ nmi:
     @check_dma_flag:
         lda dmaflag
         beq @check_draw_flag
-            lda #0      ; do sprite DMA
-            sta OAMADDR   ; conditional via the 'dmaflag' flag
+            lda #0
+            sta dmaflag
+            sta OAMADDR
             lda #>OAM
-            sta OAMDMA
-            dec dmaflag
+            sta OAMDMA ; do sprite DMA
 
     @check_draw_flag:
         lda drawflag          ; do other PPU drawing (NT/Palette/whathaveyou)
         beq @check_ppu_flag ; conditional via the 'drawflag' flag
             bit PPUSTATUS         ; clear VBl flag, reset PPUSCROLL/PPUADDR toggle
             jsr DoDrawing     ; draw the stuff from the drawing buffer
-            dec drawflag
+            lda #0
+            sta drawflag
 
     @check_ppu_flag:
         lda ppuflag
@@ -36,7 +37,8 @@ nmi:
             sta PPUSCROLL
             lda yscroll
             sta PPUSCROLL
-            dec ppuflag
+            lda #0
+            sta ppuflag
 
     @music_handler:
         jsr MusicEngine

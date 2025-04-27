@@ -7,6 +7,8 @@ stateGameMenu:
     jmp stateMachineEnd
 
 stateGameStart:
+    lda #1
+    sta drawflag
     lda stateTemp1
     cmp #9
     beq :+
@@ -24,6 +26,9 @@ stateGameStart:
     sta playerMaxY ; set ground level
     sta playerMaxYright
     sta playerY
+
+    lda #InitialPlayerWeight
+    sta playerWeight
 
     jmp stateMachineEnd
 
@@ -48,6 +53,7 @@ stateGamePlaying:
     jsr getCurrentGroundLevel
     jsr applyGravity
     jsr applyControls
+    jsr applyCollisions
 
     lda playerY
     ldx #Sprites::Sprite6y
@@ -66,6 +72,8 @@ stateGameOver:
 getCurrentGroundLevel:
     ldx currentMapColumn
     lda map, x
+    ; clc
+    ; adc playerGroundCollision
     asl
     asl
     asl
@@ -74,6 +82,9 @@ getCurrentGroundLevel:
     sta temp3 ; center column address
     sta temp4 ; right column address
     tax
+
+    lda columns+13, x
+    sta currentColumnDestructible
     
     lda columns+14, x
     sta temp2a ; left column special byte
@@ -129,6 +140,11 @@ getCurrentGroundLevel:
         beq checkRightGroundLevelSpecial
             sec
             sbc #1
+            ldx currentColumnDestructible
+            beq :+
+                clc
+                adc playerWeight
+            :
             asl
             asl
             asl
@@ -150,6 +166,11 @@ getCurrentGroundLevel:
             lda temp4a
             sec
             sbc #1
+            ldx currentColumnDestructible
+            beq :+
+                clc
+                adc playerWeight
+            :
             asl
             asl
             asl
@@ -171,6 +192,11 @@ getCurrentGroundLevel:
             lda temp2a
             sec
             sbc #1
+            ldx currentColumnDestructible
+            beq :+
+                clc
+                adc playerWeight
+            :
             asl
             asl
             asl
@@ -235,10 +261,12 @@ applyControls:
                     lda currentMapColumn
                     lsr
                     sta currentCenter ; store 32px column number
-                    clc 
-                    sbc #4
+                    sec 
+                    sbc #5
                     and #%01111111 ; only 0-127
                     sta currentDrawingColumn
+                    lda #1
+                    sta drawflag
                 :
 
     checkRightButton:
@@ -272,9 +300,11 @@ applyControls:
                     lsr
                     sta currentCenter ; store 32px column number
                     clc 
-                    adc #4
+                    adc #5
                     and #%01111111 ; only 0-127
                     sta currentDrawingColumn
+                    lda #1
+                    sta drawflag
                 :
     checkAButton:
         lda buttons1
@@ -298,6 +328,8 @@ applyGravity:
     lda playerY
     cmp playerMaxY
     bcs applyGravityEnd
+        lda #0
+        sta playerGroundCollision
         lda playerVelocityY
         clc
         adc #gravityValue
@@ -325,7 +357,45 @@ applyGravity:
         lda #0
         sta playerVelocityY
         sta playerTempVelocityY
+        lda #1
+        sta playerGroundCollision
         rts
+
+applyCollisions:
+    lda currentColumnDestructible
+    beq cancelCollision
+
+        lda playerGroundCollision
+        cmp playerPreviousCollision
+        beq applyCollisionsEnd ; check if no change
+
+            sta playerPreviousCollision
+            lda playerGroundCollision
+            beq cancelCollision ; check if collision is zero
+
+                lda currentCenter
+                sta lastCollisionColumn
+                sta currentDrawingColumn
+                lda playerWeight
+                sta currentColumnDestructionOffset
+                lda #1
+                sta drawflag
+                rts
+
+        cancelCollision:
+            lda currentColumnDestructionOffset
+            beq applyCollisionsEnd
+                lda lastCollisionColumn
+                sta currentDrawingColumn
+                lda #0
+                sta currentColumnDestructionOffset
+                lda #1
+                sta drawflag
+                rts
+
+    applyCollisionsEnd:
+
+    rts
 
 JumpTable:
     .addr stateGameInit
