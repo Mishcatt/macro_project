@@ -167,6 +167,15 @@ initial_variables:
     asl
     sta currentMapColumn
 
+    ldx #0
+load_map:
+    lda MAP_ROM, x
+    sta map, x
+    inx 
+    bne load_map
+
+    stx nmiflag ; zero the NMI flag
+
 main_loop:
     lda nmiflag
     beq main_loop   ; wait for nmi_flag
