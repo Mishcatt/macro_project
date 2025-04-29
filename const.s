@@ -1,6 +1,8 @@
 DRAWBUFFER  := $0100  ; Beginning of Drawing Buffer
 COLORBUFFER := $0178  ; Beginning of Color Buffer
 OAM         := $0200  ; Beginning of OAM Shadow buffer
+SOUNDBUFFER := $0300
+MAPBUFFER   := $0400
 
 InitialState := 2
 InitialCenter := 4
