@@ -50,6 +50,7 @@ stateGamePlaying:
     ldx #Sprites::Sprite5x
     inc OAM, x
 
+
     jsr getCurrentGroundLevel
     jsr applyGravity
     jsr applyControls
@@ -140,11 +141,11 @@ getCurrentGroundLevel:
         beq checkRightGroundLevelSpecial
             sec
             sbc #1
-            ldx currentColumnDestructible
-            beq :+
-                clc
-                adc playerWeight
-            :
+            ; ldx currentColumnDestructible
+            ; beq :+
+            ;     clc
+            ;     adc playerWeight
+            ; :
             asl
             asl
             asl
@@ -166,11 +167,11 @@ getCurrentGroundLevel:
             lda temp4a
             sec
             sbc #1
-            ldx currentColumnDestructible
-            beq :+
-                clc
-                adc playerWeight
-            :
+            ; ldx currentColumnDestructible
+            ; beq :+
+            ;     clc
+            ;     adc playerWeight
+            ; :
             asl
             asl
             asl
@@ -192,11 +193,11 @@ getCurrentGroundLevel:
             lda temp2a
             sec
             sbc #1
-            ldx currentColumnDestructible
-            beq :+
-                clc
-                adc playerWeight
-            :
+            ; ldx currentColumnDestructible
+            ; beq :+
+            ;     clc
+            ;     adc playerWeight
+            ; :
             asl
             asl
             asl
@@ -348,6 +349,8 @@ applyGravity:
         adc playerTempVelocityY
         cmp playerMaxY
         bcc :+
+            lda #1
+            sta playerGroundCollision
             lda playerMaxY
         :
         sta playerY
@@ -376,8 +379,18 @@ applyCollisions:
                 lda currentCenter
                 sta lastCollisionColumn
                 sta currentDrawingColumn
+                asl
+                tax
                 lda playerWeight
                 sta currentColumnDestructionOffset
+                clc 
+                adc map, x
+                sta map, x
+                inx 
+                lda playerWeight
+                clc 
+                adc map, x
+                sta map, x
                 lda #1
                 sta drawflag
                 rts
@@ -387,6 +400,17 @@ applyCollisions:
             beq applyCollisionsEnd
                 lda lastCollisionColumn
                 sta currentDrawingColumn
+                asl
+                tax
+                lda map, x
+                sec 
+                sbc currentColumnDestructionOffset
+                sta map, x 
+                inx
+                lda map, x
+                sec
+                sbc currentColumnDestructionOffset
+                sta map, x
                 lda #0
                 sta currentColumnDestructionOffset
                 lda #1

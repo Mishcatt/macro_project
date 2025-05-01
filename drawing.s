@@ -148,8 +148,8 @@ PrepareDrawing:
         ora temp2a ; add map offset
         tax
         lda map, x
-        clc
-        adc currentColumnDestructionOffset
+        ; clc
+        ; adc currentColumnDestructionOffset
         asl
         asl
         asl
@@ -188,8 +188,8 @@ PrepareDrawing:
         tax
         inc temp2a ; 0 1
         lda map, x
-        clc
-        adc currentColumnDestructionOffset
+        ; clc
+        ; adc currentColumnDestructionOffset
         asl
         asl
         asl
