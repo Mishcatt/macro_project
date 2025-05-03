@@ -30,6 +30,9 @@ stateGameStart:
     lda #InitialPlayerWeight
     sta playerWeight
 
+    lda #0
+    sta collisionTimer
+
     jmp stateMachineEnd
 
 stateGamePlaying:
@@ -72,7 +75,7 @@ stateGameOver:
 
 getCurrentGroundLevel:
     ldx currentMapColumn
-    lda map, x
+    lda MAP, x
     ; clc
     ; adc playerGroundCollision
     asl
@@ -107,7 +110,7 @@ getCurrentGroundLevel:
         bne checkLeftGroundLevel
             ldx currentMapColumn
             inx
-            lda map, x
+            lda MAP, x
             asl
             asl
             asl
@@ -124,7 +127,7 @@ getCurrentGroundLevel:
         bne checkGroundLevelSpecial ; check for 0 - first pixel on left
             ldx currentMapColumn
             dex
-            lda map, x
+            lda MAP, x
             asl
             asl
             asl
@@ -365,57 +368,67 @@ applyGravity:
         rts
 
 applyCollisions:
-    lda currentColumnDestructible
-    beq cancelCollision
+    lda collisionTimer
+    beq :+
+        dec collisionTimer
+        rts
+    :
+        lda currentColumnDestructible
+        beq cancelCollision
 
-        lda playerGroundCollision
-        cmp playerPreviousCollision
-        beq applyCollisionsEnd ; check if no change
-
-            sta playerPreviousCollision
             lda playerGroundCollision
-            beq cancelCollision ; check if collision is zero
+            cmp playerPreviousCollision
+            beq applyCollisionsEnd ; check if no change
 
-                lda currentCenter
-                sta lastCollisionColumn
-                sta currentDrawingColumn
-                asl
-                tax
-                lda playerWeight
-                sta currentColumnDestructionOffset
-                clc 
-                adc map, x
-                sta map, x
-                inx 
-                lda playerWeight
-                clc 
-                adc map, x
-                sta map, x
-                lda #1
-                sta drawflag
-                rts
+                sta playerPreviousCollision
 
-        cancelCollision:
-            lda currentColumnDestructionOffset
-            beq applyCollisionsEnd
-                lda lastCollisionColumn
-                sta currentDrawingColumn
-                asl
-                tax
-                lda map, x
-                sec 
-                sbc currentColumnDestructionOffset
-                sta map, x 
-                inx
-                lda map, x
-                sec
-                sbc currentColumnDestructionOffset
-                sta map, x
-                lda #0
-                sta currentColumnDestructionOffset
-                lda #1
-                sta drawflag
-                rts
+                lda #collisionTimerValue
+                sta collisionTimer
+
+                lda playerGroundCollision
+                beq cancelCollision ; check if collision is zero
+
+                    lda currentCenter
+                    sta lastCollisionColumn
+                    sta currentDrawingColumn
+                    asl
+                    tax
+                    lda playerWeight
+                    sta currentColumnDestructionOffset
+                    clc 
+                    adc MAP, x
+                    sta MAP, x
+                    inx 
+                    lda playerWeight
+                    clc 
+                    adc MAP, x
+                    sta MAP, x
+                    lda #1
+                    sta drawflag
+                    rts
+
+            cancelCollision:
+                lda currentColumnDestructionOffset
+                beq applyCollisionsEnd
+                    lda lastCollisionColumn
+                    sta currentDrawingColumn
+                    asl
+                    tax
+                    lda MAP, x
+                    sec 
+                    sbc currentColumnDestructionOffset
+                    sta MAP, x 
+                    inx
+                    lda MAP, x
+                    sec
+                    sbc currentColumnDestructionOffset
+                    sta MAP, x
+                    lda #0
+                    sta currentColumnDestructionOffset
+                    sta playerPreviousCollision
+                    lda #1
+                    sta drawflag
+                    rts
 
     applyCollisionsEnd:
 

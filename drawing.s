@@ -147,7 +147,7 @@ PrepareDrawing:
         lda temp2
         ora temp2a ; add map offset
         tax
-        lda map, x
+        lda MAP, x
         ; clc
         ; adc currentColumnDestructionOffset
         asl
@@ -187,7 +187,7 @@ PrepareDrawing:
         ora temp2a ; add map offset
         tax
         inc temp2a ; 0 1
-        lda map, x
+        lda MAP, x
         ; clc
         ; adc currentColumnDestructionOffset
         asl
@@ -240,7 +240,7 @@ PrepareColors:
     @drawing3:
 
         ldx temp2
-        lda map, x ; first half of 32px column
+        lda MAP, x ; first half of 32px column
         asl
         asl
         asl
@@ -249,7 +249,7 @@ PrepareColors:
 
         ldx temp2
         inx
-        lda map, x ; second half of 32px column
+        lda MAP, x ; second half of 32px column
         asl
         asl
         asl

@@ -20,8 +20,8 @@
     yscroll:    .res 1
 
     playerX: .res 1
-    playerY: .res 1
-    playerMaxYleft: .res 1
+    playerY: .res 1 ; 0x0F
+    playerMaxYleft: .res 1 ; 0x10
     playerMaxY: .res 1
     playerMaxYright: .res 1
     playerGroundCollision: .res 1
@@ -38,8 +38,8 @@
     currentColumnDestructionOffset: .res 1
     lastCollisionColumn: .res 1
 
-    currentRenderColumn: .res 1
-    tempRenderColumn: .res 1
+    currentRenderColumn: .res 1 ; 0x1F
+    tempRenderColumn: .res 1 ; 0x20
     currentRenderRow: .res 1
     currentRenderNametableAddress: .res 1
     tempRenderNametableAddress: .res 1
@@ -58,10 +58,12 @@
     temp2: .res 1
     temp2a: .res 1
     temp3: .res 1
-    temp3a: .res 1
-    temp3b: .res 1
+    temp3a: .res 1 ; 0x2F
+    temp3b: .res 1 ; 0x30
     temp4: .res 1
     temp4a: .res 1
+
+    collisionTimer: .res 1
 
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
@@ -76,7 +78,7 @@
   ;; When the processor first turns on or is reset, it will jump to the label reset:
   .addr reset
   ;; External interrupt IRQ (unused)
-  .addr 0
+  .addr irq
 
 ; "nes" linker config requires a STARTUP section, even if it's empty
 .segment "STARTUP"
@@ -170,7 +172,7 @@ initial_variables:
     ldx #0
 load_map:
     lda MAP_ROM, x
-    sta map, x
+    sta MAP, x
     inx 
     bne load_map
 
@@ -246,6 +248,7 @@ MusicEngine:
     rts
 
 .include "nmi.s"
+.include "irq.s"
 .include "maps.s"
 .include "sprites.s"
 .include "palettes.s"

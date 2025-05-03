@@ -2,7 +2,7 @@ DRAWBUFFER  := $0100  ; Beginning of Drawing Buffer
 COLORBUFFER := $0178  ; Beginning of Color Buffer
 OAM         := $0200  ; Beginning of OAM Shadow buffer
 SOUNDBUFFER := $0300
-map         := $0400
+MAP         := $0400
 
 InitialState := 2
 InitialCenter := 4
@@ -10,6 +10,7 @@ InitialPlayerWeight := 1
 
 gravityValue := 1
 jumpVelocity := $F8 ; -8
+collisionTimerValue := 4
 
 .enum Sprites
     Sprite0y = 0
@@ -62,3 +63,5 @@ buttons2 = buttons + 1
     GameOver
 .endenum
 
+konamiCode:
+    .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80
