@@ -65,6 +65,10 @@
 
     collisionTimer: .res 1
 
+    dmcCounter: .res 1
+    dmcTemp: .res 1
+    dmcIRQenable: .res 1
+
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
   .byte $4E, $45, $53, $1A
@@ -90,13 +94,13 @@ reset:
     sei		; disable IRQs
     cld		; disable decimal mode
     ldx #$40
-    stx $4017	; disable APU frame IRQ
+    stx JOYPAD2	; disable APU frame IRQ
     ldx #$ff 	; Set up stack
     txs		;  .
     inx		; now X = 0
     stx PPUCTRL	; disable NMI
     stx PPUMASK 	; disable rendering
-    stx $4010 	; disable DMC IRQs
+    stx DMC_FREQ 	; disable DMC IRQs
 
 ;; first wait for vblank to make sure PPU is ready
 vblankwait1:
@@ -153,10 +157,10 @@ set_scroll:
     ; inc ppuflag
 
 enable_rendering:
-    lda #%10000100	; Enable NMI and vertical increment
+    lda #%10001100	; Enable NMI, sprite tile 1, vertical increment
     sta PPUCTRL
     sta softPPUCTRL
-    lda #%00011010	; Enable Sprites and Background
+    lda #%00011110	; Enable Sprites and Background
     sta PPUMASK
     sta softPPUMASK
     ; inc drawflag
@@ -177,12 +181,30 @@ load_map:
     bne load_map
 
     stx nmiflag ; zero the NMI flag
+    cli         ; enable interrupts
 
 main_loop:
     lda nmiflag
     beq main_loop   ; wait for nmi_flag
 
     jsr readjoyx2   ; read two gamepads
+
+    lda dmcIRQenable
+    beq :+
+        lda dmcCounterValue
+        sta dmcCounter
+
+        lda #%10001111 ; enable DMC IRQ
+        sta DMC_FREQ
+        lda #0
+        sta DMC_START
+        sta DMC_RAW
+        lda #1
+        sta DMC_LEN
+
+        lda #%00010000 ; enable DMC
+        sta SND_CHN
+    :
 
     stateMachine:
         lda currentState
@@ -229,11 +251,14 @@ main_loop:
         bmi skipSpriteCheck
         bvc sprite0loop ; loop if still clear
 
-        lda #0
-        sta PPUSCROLL
-        lda #%10000000
-        sta PPUCTRL
-        bit PPUSTATUS
+        lda dmcIRQenable
+        bne :+
+            lda #0
+            sta PPUSCROLL
+            lda #%10001000
+            sta PPUCTRL
+            bit PPUSTATUS
+        :
 
     skipSpriteCheck:
         lda #0

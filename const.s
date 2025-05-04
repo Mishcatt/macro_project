@@ -12,6 +12,9 @@ gravityValue := 1
 jumpVelocity := $F8 ; -8
 collisionTimerValue := 4
 
+dmcCounterValue := 2
+dmcYsplitValue := 130
+
 .enum Sprites
     Sprite0y = 0
     Sprite0Index
