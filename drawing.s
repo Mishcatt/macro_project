@@ -1,5 +1,5 @@
 DoDrawing:
-    lda #%10000100  ; Enable NMI and vertical increment
+    lda #%10001100  ; Enable NMI, sprite tile 1, vertical increment
     sta PPUCTRL
     bit PPUSTATUS   ; clear w register by reading Status
 
@@ -89,7 +89,7 @@ DoDrawing:
         jmp draw1
     draw1end:
 
-    lda #%10000000  ; Enable NMI and horizontal increment
+    lda #%10001000  ; Enable NMI, sprite tile 1, horizontal increment
     sta PPUCTRL
     bit PPUSTATUS   ; clear w register by reading Status
 
