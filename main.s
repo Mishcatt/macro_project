@@ -242,23 +242,23 @@ main_loop:
     ; sta drawflag
     sta dmaflag
 
-    vblankLoop:
-        bit PPUSTATUS  ; check for sprite 0 clear
-        bvs vblankLoop ; loop if still set (still in previous vBlank)
+    lda dmcIRQenable
+    bne skipSpriteCheck
 
-    sprite0loop:
-        bit PPUSTATUS   ; check for sprite 0 set
-        bmi skipSpriteCheck
-        bvc sprite0loop ; loop if still clear
+        vblankLoop:
+            bit PPUSTATUS  ; check for sprite 0 clear
+            bvs vblankLoop ; loop if still set (still in previous vBlank)
 
-        lda dmcIRQenable
-        bne :+
+        sprite0loop:
+            bit PPUSTATUS   ; check for sprite 0 set
+            bmi skipSpriteCheck
+            bvc sprite0loop ; loop if still clear
+
             lda #0
             sta PPUSCROLL
             lda #%10001000
             sta PPUCTRL
             bit PPUSTATUS
-        :
 
     skipSpriteCheck:
         lda #0
