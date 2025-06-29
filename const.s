@@ -14,6 +14,7 @@ gravityValue := 1
 jumpVelocity := $F8 ; -8
 collisionTimerValue := 4
 
+dmcIRQenableValue := 1
 dmcCounterValue := 2
 dmcYsplitValue := 130
 

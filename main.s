@@ -172,6 +172,8 @@ initial_variables:
     sta currentCenter
     asl
     sta currentMapColumn
+    lda #dmcIRQenableValue
+    sta dmcIRQenable
 
     ldx #0
 load_map:
