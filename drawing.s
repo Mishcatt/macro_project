@@ -326,5 +326,8 @@ PrepareColors:
             lda temp3a
             cmp #14
             bcc @drawing2A
+    lda #%00001111  ; keep statusbar unchanged
+    and COLORBUFFER+6
+    sta COLORBUFFER+6
 
     rts
