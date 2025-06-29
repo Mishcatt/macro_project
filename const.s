@@ -2,7 +2,9 @@ DRAWBUFFER  := $0100  ; Beginning of Drawing Buffer
 COLORBUFFER := $0178  ; Beginning of Color Buffer
 OAM         := $0200  ; Beginning of OAM Shadow buffer
 SOUNDBUFFER := $0300
-MAP         := $0400
+MAP         := $0400  ; 256 bytes of map columns 
+STATUSBAR1  := $0500  ; two rows of nametable 0
+STATUSBAR2  := $0540  ; two rows of nametable 1
 
 InitialState := 2
 InitialCenter := 4
@@ -14,6 +16,8 @@ collisionTimerValue := 4
 
 dmcCounterValue := 2
 dmcYsplitValue := 130
+
+emptyTile := $25
 
 .enum Sprites
     Sprite0y = 0
@@ -65,6 +69,9 @@ buttons2 = buttons + 1
     GameFinish
     GameOver
 .endenum
+
+famicon:
+    .byte $10, $0B, $17, $13, $0D, $19, $18, $25, $02, $08
 
 konamiCode:
     .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80

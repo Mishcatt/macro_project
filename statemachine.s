@@ -33,6 +33,8 @@ stateGameStart:
     lda #0
     sta collisionTimer
 
+    jsr initStatusbar
+
     jmp stateMachineEnd
 
 stateGamePlaying:
@@ -431,6 +433,26 @@ applyCollisions:
                     rts
 
     applyCollisionsEnd:
+
+    rts
+
+initStatusbar:
+    lda #emptyTile
+    ldx #$7F
+    :
+        sta STATUSBAR1, x
+        dex
+        bne :-
+    sta STATUSBAR1
+
+    rts
+
+updateStatusbar:
+
+    sta STATUSBAR1, x ; first row
+
+
+    sta STATUSBAR1+$20, x ; second row
 
     rts
 

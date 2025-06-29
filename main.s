@@ -26,7 +26,7 @@
     playerMaxYright: .res 1
     playerGroundCollision: .res 1
     playerPreviousCollision: .res 1
-    playerVelocityY: .res 1 ; used vor gravity calculation
+    playerVelocityY: .res 1 ; used for gravity calculation
     playerTempVelocityY: .res 1 ; used for player position
     playerVelocityX: .res 1
     playerTempVelocityX: .res 1
