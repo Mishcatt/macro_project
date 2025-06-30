@@ -14,11 +14,14 @@ gravityValue := 1
 jumpVelocity := $F8 ; -8
 collisionTimerValue := 4
 
-dmcIRQenableValue := 1
+dmcIRQenableValue := 0
 dmcCounterValue := 2
 dmcYsplitValue := 130
 
 emptyTile := $25
+
+statusbar_offset_stomp := 13
+statusbar_offset_size := 21
 
 .enum Sprites
     Sprite0y = 0
@@ -73,6 +76,12 @@ buttons2 = buttons + 1
 
 famicon:
     .byte $10, $0B, $17, $13, $0D, $19, $18, $25, $02, $08
+
+text_stomp:
+    .byte $1D, $1E, $19, $17, $1A, emptyTile
+
+text_size:
+    .byte emptyTile, $1D, $13, $24, $0F, emptyTile
 
 konamiCode:
     .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80

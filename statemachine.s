@@ -65,6 +65,8 @@ stateGamePlaying:
     ldx #Sprites::Sprite6y
     sta OAM, x ; store player sprite Y position
 
+    jsr updateStatusbar
+
     jmp stateMachineEnd
 
 stateGameFinish:
@@ -438,19 +440,25 @@ applyCollisions:
 
 initStatusbar:
     lda #emptyTile
-    ldx #$7F
+
+    ldx #$80
     :
-        sta STATUSBAR1, x
         dex
-        bne :-
-    sta STATUSBAR1
+        sta STATUSBAR1, x
+    bne :-
 
     rts
 
 updateStatusbar:
 
-    sta STATUSBAR1, x ; first row
-
+    ldx #6
+    :
+        dex
+        lda text_stomp, x
+        sta STATUSBAR1+statusbar_offset_stomp, x
+        lda text_size, x
+        sta STATUSBAR1+statusbar_offset_size, x
+    bne :-
 
     sta STATUSBAR1+$20, x ; second row
 
