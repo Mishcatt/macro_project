@@ -473,6 +473,7 @@ updateStatusbar:
         bne :-
         lda #1
         sta drawStatusbar1Flag
+        inc statusbarState
 
     @updateStatusbarEnd:
     rts
