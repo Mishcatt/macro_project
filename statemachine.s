@@ -463,13 +463,16 @@ updateStatusbar:
             dex
             lda text_stomp, x
             sta STATUSBAR1+statusbar_offset_stomp, x
+            lda #CHAR_BAR1
+            sta STATUSBAR1+statusbar_offset_stompBar, x
             lda text_size, x
             sta STATUSBAR1+statusbar_offset_size, x
+            lda #CHAR_BAR0
+            sta STATUSBAR1+statusbar_offset_sizeBar, x
+            txa
         bne :-
         lda #1
         sta drawStatusbar1Flag
-
-    sta STATUSBAR1+$20, x ; second row
 
     @updateStatusbarEnd:
     rts

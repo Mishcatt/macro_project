@@ -19,7 +19,9 @@ dmcCounterValue := 2
 dmcYsplitValue := 130
 
 statusbar_offset_stomp := 13
+statusbar_offset_stompBar := 45
 statusbar_offset_size := 21
+statusbar_offset_sizeBar := 53
 
 .enum Sprites
     Sprite0y = 0
