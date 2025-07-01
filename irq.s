@@ -38,7 +38,7 @@ irq:
     asl ; x4 = $00, $04, $08, $0C
     sta PPUADDR
 
-    lda #dmcYsplitValue
+    lda #DMCYsplitValue
     sta PPUSCROLL
 
     and #%11111000

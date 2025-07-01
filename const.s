@@ -8,20 +8,20 @@ STATUSBAR2  := $0540  ; two rows of nametable 1
 
 InitialState := 2
 InitialCenter := 4
-InitialPlayerWeight := 1
+InitialPlayerSize := 1
 
-gravityValue := 1
-jumpVelocity := $F8 ; -8
-collisionTimerValue := 4
+GravityValue := 1
+JumpVelocity := $F8 ; -8
+CollisionTimerValue := 4
 
-dmcIRQenableValue := 0
-dmcCounterValue := 2
-dmcYsplitValue := 130
+DMCIRQenableValue := 0
+DMCCounterValue := 2
+DMCYsplitValue := 130
 
-statusbar_offset_stomp := 13
-statusbar_offset_stompBar := 45
-statusbar_offset_size := 21
-statusbar_offset_sizeBar := 53
+StatusbarOffsetStomp := 13
+StatusbarOffsetStompBar := 45
+StatusbarOffsetSize := 21
+StatusbarOffsetSizeBar := 53
 
 .enum Sprites
     Sprite0y = 0
@@ -61,9 +61,6 @@ statusbar_offset_sizeBar := 53
     Sprite8Attributes
     Sprite8x
 .endenum
-
-buttons1 = buttons
-buttons2 = buttons + 1
 
 .enum GameStates
     GameInit = 0
@@ -122,14 +119,14 @@ buttons2 = buttons + 1
     CHAR_EMPTY
 .endenum
 
-famicon:
+Famicon:
     .byte $10, $0B, $17, $13, $0D, $19, $18, $25, $02, $08
 
-text_stomp:
+TextStomp:
     .byte $1D, $1E, $19, $17, $1A, CHAR_EMPTY
 
-text_size:
+TextSize:
     .byte CHAR_EMPTY, $1D, $13, $24, $0F, CHAR_EMPTY
 
-konamiCode:
+KonamiCode:
     .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80

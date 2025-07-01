@@ -27,8 +27,8 @@ stateGameStart:
     sta playerMaxYright
     sta playerY
 
-    lda #InitialPlayerWeight
-    sta playerWeight
+    lda #InitialPlayerSize
+    sta playerSize
 
     lda #0
     sta collisionTimer
@@ -220,6 +220,10 @@ getCurrentGroundLevel:
 
 applyControls:
     lda buttons1
+    cmp previousButtons1
+
+
+    lda buttons1
     and #BUTTON_UP
     beq :+ 
         lda playerY
@@ -321,7 +325,7 @@ applyControls:
             lda playerY
             cmp playerMaxY
             bne :+
-                lda #jumpVelocity
+                lda #JumpVelocity
                 sta playerVelocityY
                 dec playerY
             :
@@ -340,7 +344,7 @@ applyGravity:
         sta playerGroundCollision
         lda playerVelocityY
         clc
-        adc #gravityValue
+        adc #GravityValue
         sta playerVelocityY
         and #%10000000
         sta temp1 ; store sign value
@@ -386,7 +390,7 @@ applyCollisions:
 
                 sta playerPreviousCollision
 
-                lda #collisionTimerValue
+                lda #CollisionTimerValue
                 sta collisionTimer
 
                 lda playerGroundCollision
@@ -397,13 +401,13 @@ applyCollisions:
                     sta currentDrawingColumn
                     asl
                     tax
-                    lda playerWeight
+                    lda playerSize
                     sta currentColumnDestructionOffset
                     clc 
                     adc MAP, x
                     sta MAP, x
                     inx 
-                    lda playerWeight
+                    lda playerSize
                     clc 
                     adc MAP, x
                     sta MAP, x
@@ -461,14 +465,14 @@ updateStatusbar:
         ldx #6
         :
             dex
-            lda text_stomp, x
-            sta STATUSBAR1+statusbar_offset_stomp, x
+            lda TextStomp, x
+            sta STATUSBAR1+StatusbarOffsetStomp, x
             lda #CHAR_BAR1
-            sta STATUSBAR1+statusbar_offset_stompBar, x
-            lda text_size, x
-            sta STATUSBAR1+statusbar_offset_size, x
+            sta STATUSBAR1+StatusbarOffsetStompBar, x
+            lda TextSize, x
+            sta STATUSBAR1+StatusbarOffsetSize, x
             lda #CHAR_BAR0
-            sta STATUSBAR1+statusbar_offset_sizeBar, x
+            sta STATUSBAR1+StatusbarOffsetSizeBar, x
             txa
         bne :-
         lda #1

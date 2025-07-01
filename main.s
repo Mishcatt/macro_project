@@ -2,7 +2,12 @@
 .include "const.s"
 
 .zeropage
-    buttons:    .res 2
+    buttons1:    .res 1
+    buttons2:    .res 1
+    previousButtons1: .res 1
+    previousButtons2: .res 1
+    tempButtons1: .res 1
+    tempButtons2: .res 1
 
     currentState: .res 1
     tempAddr: .res 2
@@ -30,10 +35,10 @@
     playerTempVelocityY: .res 1 ; used for player position
     playerVelocityX: .res 1
     playerTempVelocityX: .res 1
-    playerWeight: .res 1 ; 0 light, 1 medium, 2 heavy
+    playerSize: .res 1 ; 0 light, 1 medium, 2 heavy
 
     currentCenter: .res 1
-    currentMapColumn: .res 1
+    currentMapColumn: .res 1 ; 32
     currentColumnDestructible: .res 1
     currentColumnDestructionOffset: .res 1
     lastCollisionColumn: .res 1
@@ -176,7 +181,7 @@ initial_variables:
     sta currentCenter
     asl
     sta currentMapColumn
-    lda #dmcIRQenableValue
+    lda #DMCIRQenableValue
     sta dmcIRQenable
 
     ldx #0
@@ -197,7 +202,7 @@ main_loop:
 
     lda dmcIRQenable
     beq :+
-        lda dmcCounterValue
+        lda DMCCounterValue
         sta dmcCounter
 
         lda #%10001111 ; enable DMC IRQ
