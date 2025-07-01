@@ -35,7 +35,8 @@
     playerTempVelocityY: .res 1 ; used for player position
     playerVelocityX: .res 1
     playerTempVelocityX: .res 1
-    playerSize: .res 1 ; 0 light, 1 medium, 2 heavy
+    playerSize: .res 1
+    playerStomp: .res 1
 
     currentCenter: .res 1
     currentMapColumn: .res 1 ; 32

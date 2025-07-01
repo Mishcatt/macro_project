@@ -219,9 +219,40 @@ getCurrentGroundLevel:
     rts
 
 applyControls:
+    lda #0
+    sta tempButtons1
+    sta tempButtons2
+
     lda buttons1
     cmp previousButtons1
+    beq :+
+        eor previousButtons1
+        and buttons1
+        sta tempButtons1
+        lda buttons1
+        sta previousButtons1
+    :
+    
+    lda buttons2
+    cmp previousButtons2
+    beq :+
+        eor previousButtons2
+        and buttons2
+        sta tempButtons2
+        lda buttons2
+        sta previousButtons2
+    :
 
+    lda tempButtons1
+    and #BUTTON_SELECT
+    beq :+
+        inc playerStomp
+        lda playerStomp
+        cmp #MaxPlayerStomp
+        bcc :+
+            lda #MaxPlayerStomp
+            sta playerStomp
+    :
 
     lda buttons1
     and #BUTTON_UP

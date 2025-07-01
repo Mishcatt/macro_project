@@ -10,6 +10,9 @@ InitialState := 2
 InitialCenter := 4
 InitialPlayerSize := 1
 
+MaxPlayerStomp := 6
+MaxPlayerSize := 6
+
 GravityValue := 1
 JumpVelocity := $F8 ; -8
 CollisionTimerValue := 4
