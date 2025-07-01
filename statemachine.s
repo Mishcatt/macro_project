@@ -439,7 +439,7 @@ applyCollisions:
     rts
 
 initStatusbar:
-    lda #emptyTile
+    lda #CHAR_EMPTY
 
     ldx #$80
     :

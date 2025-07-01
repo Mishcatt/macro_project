@@ -18,8 +18,6 @@ dmcIRQenableValue := 0
 dmcCounterValue := 2
 dmcYsplitValue := 130
 
-emptyTile := $25
-
 statusbar_offset_stomp := 13
 statusbar_offset_size := 21
 
@@ -65,7 +63,7 @@ statusbar_offset_size := 21
 buttons1 = buttons
 buttons2 = buttons + 1
 
-.enum  GameStates
+.enum GameStates
     GameInit = 0
     GameMenu
     GameStart
@@ -74,14 +72,62 @@ buttons2 = buttons + 1
     GameOver
 .endenum
 
+.enum
+    StatusbarInit = 0
+    StatusbarUpdate
+    StatusbarCurrent
+.endenum
+
+.enum
+    CHAR_0 = 1
+    CHAR_1
+    CHAR_2
+    CHAR_3
+    CHAR_4
+    CHAR_5
+    CHAR_6
+    CHAR_7
+    CHAR_8
+    CHAR_9
+    CHAR_A
+    CHAR_B
+    CHAR_C
+    CHAR_D
+    CHAR_E
+    CHAR_F
+    CHAR_G
+    CHAR_H
+    CHAR_I
+    CHAR_J
+    CHAR_K
+    CHAR_L
+    CHAR_M
+    CHAR_N
+    CHAR_O
+    CHAR_P
+    CHAR_Q
+    CHAR_R
+    CHAR_S
+    CHAR_T
+    CHAR_U
+    CHAR_V
+    CHAR_W
+    CHAR_X
+    CHAR_Y
+    CHAR_Z
+    CHAR_BAR0
+    CHAR_BAR1
+    CHAR_EMPTY
+.endenum
+
 famicon:
     .byte $10, $0B, $17, $13, $0D, $19, $18, $25, $02, $08
 
 text_stomp:
-    .byte $1D, $1E, $19, $17, $1A, emptyTile
+    .byte $1D, $1E, $19, $17, $1A, CHAR_EMPTY
 
 text_size:
-    .byte emptyTile, $1D, $13, $24, $0F, emptyTile
+    .byte CHAR_EMPTY, $1D, $13, $24, $0F, CHAR_EMPTY
 
 konamiCode:
     .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80
