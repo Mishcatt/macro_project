@@ -447,21 +447,31 @@ initStatusbar:
         sta STATUSBAR1, x
     bne :-
 
+    lda #StatusbarUpdate
+    sta statusbarState
+    sta drawStatusbar1Flag
+    sta drawStatusbar2Flag
+
     rts
 
 updateStatusbar:
-
-    ldx #6
-    :
-        dex
-        lda text_stomp, x
-        sta STATUSBAR1+statusbar_offset_stomp, x
-        lda text_size, x
-        sta STATUSBAR1+statusbar_offset_size, x
-    bne :-
+    lda statusbarState
+    cmp #StatusbarUpdate
+    bne @updateStatusbarEnd
+        ldx #6
+        :
+            dex
+            lda text_stomp, x
+            sta STATUSBAR1+statusbar_offset_stomp, x
+            lda text_size, x
+            sta STATUSBAR1+statusbar_offset_size, x
+        bne :-
+        lda #1
+        sta drawStatusbar1Flag
 
     sta STATUSBAR1+$20, x ; second row
 
+    @updateStatusbarEnd:
     rts
 
 JumpTable:

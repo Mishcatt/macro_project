@@ -21,6 +21,12 @@ nmi:
         ; lda drawflag          ; do other PPU drawing (NT/Palette/whathaveyou)
         ; beq @check_ppu_flag ; conditional via the 'drawflag' flag
             bit PPUSTATUS         ; clear VBl flag, reset PPUSCROLL/PPUADDR toggle
+            lda drawStatusbar1Flag
+            ora drawStatusbar2Flag
+            beq :+
+                jsr DrawStatusbar
+                jmp @check_ppu_flag
+            :
             jsr DoDrawing     ; draw the stuff from the drawing buffer
             lda #0
             sta drawflag

@@ -54,6 +54,10 @@
     drawingLoop1: .res 1
     drawingLoop2: .res 1
 
+    statusbarState: .res 1
+    drawStatusbar1Flag: .res 1
+    drawStatusbar2Flag: .res 1
+
     temp1: .res 1
     temp2: .res 1
     temp2a: .res 1

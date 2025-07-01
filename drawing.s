@@ -126,6 +126,99 @@ DoDrawing:
 
     rts
 
+DrawStatusbar:
+    lda #%10001000  ; Enable NMI, sprite tile 1, horizontal increment
+    sta PPUCTRL
+    bit PPUSTATUS   ; clear w register by reading Status
+
+    lda #$23 ; Nametable 0
+    sta PPUADDR
+    lda #$60
+    sta PPUADDR
+
+    ldx #0 ; start at offset 0
+    ldy #0
+    drawStatus1:
+        lda STATUSBAR1 + 0, x   ; 5 cycles
+        sta PPUDATA             ; 4 cycles
+        lda STATUSBAR1 + 1, x
+        sta PPUDATA
+        lda STATUSBAR1 + 2, x
+        sta PPUDATA
+        lda STATUSBAR1 + 3, x
+        sta PPUDATA
+        lda STATUSBAR1 + 4, x
+        sta PPUDATA
+        lda STATUSBAR1 + 5, x
+        sta PPUDATA
+        lda STATUSBAR1 + 6, x
+        sta PPUDATA
+        lda STATUSBAR1 + 7, x
+        sta PPUDATA
+        lda STATUSBAR1 + 8, x
+        sta PPUDATA
+        lda STATUSBAR1 + 9, x
+        sta PPUDATA
+        lda STATUSBAR1 + 10, x
+        sta PPUDATA
+        lda STATUSBAR1 + 11, x
+        sta PPUDATA
+        lda STATUSBAR1 + 12, x
+        sta PPUDATA
+        lda STATUSBAR1 + 13, x
+        sta PPUDATA
+        lda STATUSBAR1 + 14, x
+        sta PPUDATA
+        lda STATUSBAR1 + 15, x
+        sta PPUDATA
+        lda STATUSBAR1 + 16, x
+        sta PPUDATA
+        lda STATUSBAR1 + 17, x
+        sta PPUDATA
+        lda STATUSBAR1 + 18, x
+        sta PPUDATA
+        lda STATUSBAR1 + 19, x
+        sta PPUDATA
+        lda STATUSBAR1 + 20, x
+        sta PPUDATA
+        lda STATUSBAR1 + 21, x
+        sta PPUDATA
+        lda STATUSBAR1 + 22, x
+        sta PPUDATA
+        lda STATUSBAR1 + 23, x
+        sta PPUDATA
+        lda STATUSBAR1 + 24, x
+        sta PPUDATA
+        lda STATUSBAR1 + 25, x
+        sta PPUDATA
+        lda STATUSBAR1 + 26, x
+        sta PPUDATA
+        lda STATUSBAR1 + 27, x
+        sta PPUDATA
+        lda STATUSBAR1 + 28, x
+        sta PPUDATA
+        lda STATUSBAR1 + 29, x
+        sta PPUDATA
+        lda STATUSBAR1 + 30, x
+        sta PPUDATA
+        lda STATUSBAR1 + 31, x
+        sta PPUDATA
+
+        txa
+        adc #32 ; add offset 32 to STATUSBAR1
+        tax
+        iny
+        cpy #2
+        beq drawStatus1end
+        jmp drawStatus1
+    drawStatus1end:
+
+    lda #0
+    sta drawStatusbar1Flag
+    sta drawStatusbar2Flag
+
+    rts
+
 PrepareDrawingTest:
     ldy #0
     @loop2:
