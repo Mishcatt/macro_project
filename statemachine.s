@@ -39,21 +39,21 @@ stateGameStart:
     jmp stateMachineEnd
 
 stateGamePlaying:
-    ldx #Sprites::Sprite2y
+    ldx #Sprite2y
     inc OAM, x
-    ldx #Sprites::Sprite2x
+    ldx #Sprite2x
     inc OAM, x
-    ldx #Sprites::Sprite3y
+    ldx #Sprite3y
     dec OAM, x
-    ldx #Sprites::Sprite3x
+    ldx #Sprite3x
     dec OAM, x
-    ldx #Sprites::Sprite4y
+    ldx #Sprite4y
     inc OAM, x
-    ldx #Sprites::Sprite4x
+    ldx #Sprite4x
     dec OAM, x
-    ldx #Sprites::Sprite5y
+    ldx #Sprite5y
     dec OAM, x
-    ldx #Sprites::Sprite5x
+    ldx #Sprite5x
     inc OAM, x
 
 
@@ -63,7 +63,7 @@ stateGamePlaying:
     jsr applyCollisions
 
     lda playerY
-    ldx #Sprites::Sprite6y
+    ldx #SpritePlayerM0y
     sta OAM, x ; store player sprite Y position
 
     lda playerStomp
@@ -295,7 +295,7 @@ applyControls:
         and #BUTTON_LEFT
         beq checkRightButton
 
-            ldx #Sprites::Sprite6Attributes
+            ldx #SpritePlayerM0a
             lda OAM, x
             ora #%01000000
             sta OAM, x
@@ -336,7 +336,7 @@ applyControls:
         and #BUTTON_RIGHT
         beq checkAButton
 
-            ldx #Sprites::Sprite6Attributes
+            ldx #SpritePlayerM0a
             lda OAM, x
             and #%10111111
             sta OAM, x

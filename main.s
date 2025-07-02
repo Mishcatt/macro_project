@@ -156,7 +156,7 @@ load_initial_sprites:
         lda sprites, x
         sta OAM, x         ; Load the sprites into OAM
         inx
-        cpx #64
+        cpx #SpriteLastByte
         bne @loop
     ; inc dmaflag
 
