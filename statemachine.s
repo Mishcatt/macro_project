@@ -246,6 +246,8 @@ applyControls:
     lda tempButtons1
     and #BUTTON_SELECT
     beq :+
+        lda #StatusbarUpdate
+        sta statusbarState
         inc playerStomp
         lda playerStomp
         cmp #MaxPlayerStomp
@@ -492,25 +494,42 @@ initStatusbar:
 updateStatusbar:
     lda statusbarState
     cmp #StatusbarUpdate
-    bne @updateStatusbarEnd
+    bne updateStatusbarEnd
         ldx #6
-        :
+        @updateStatusbarLoop:
             dex
             lda TextStomp, x
             sta STATUSBAR1+StatusbarOffsetStomp, x
-            lda #CHAR_BAR1
+
+            txa
+            cmp playerStomp
+            bcc :+
+                lda #CHAR_BAR0
+                jmp :++
+            :
+                lda #CHAR_BAR1
+            :
             sta STATUSBAR1+StatusbarOffsetStompBar, x
+
             lda TextSize, x
             sta STATUSBAR1+StatusbarOffsetSize, x
-            lda #CHAR_BAR0
+
+            txa
+            cmp playerSize
+            bcc :+
+                lda #CHAR_BAR0
+                jmp :++
+            :
+                lda #CHAR_BAR1
+            :
             sta STATUSBAR1+StatusbarOffsetSizeBar, x
             txa
-        bne :-
+        bne @updateStatusbarLoop
         lda #1
         sta drawStatusbar1Flag
         inc statusbarState
 
-    @updateStatusbarEnd:
+    updateStatusbarEnd:
     rts
 
 JumpTable:
