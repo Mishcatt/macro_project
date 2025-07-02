@@ -21,6 +21,7 @@ DMCIRQenableValue := 0
 DMCCounterValue := 2
 DMCYsplitValue := 130
 
+StatusbarOffsetEdition := 3
 StatusbarOffsetStomp := 13
 StatusbarOffsetStompBar := 45
 StatusbarOffsetSize := 21
@@ -336,14 +337,29 @@ BUTTON_RIGHT  = 1 << 0
     CHAR_EMPTY
 .endenum
 
-Famicon:
-    .byte $10, $0B, $17, $13, $0D, $19, $18, $25, $02, $08
+; Famicon:
+;     .byte $10, $0B, $17, $13, $0D, $19, $18, $25, $02, $08
+
+TextEdition:
+    .byte CHAR_E, CHAR_D, CHAR_I, CHAR_T, CHAR_I, CHAR_O, CHAR_N
 
 TextStomp:
-    .byte $1D, $1E, $19, $17, $1A, CHAR_EMPTY
+    .byte CHAR_S, CHAR_T, CHAR_O, CHAR_M, CHAR_P, CHAR_EMPTY
 
 TextSize:
-    .byte CHAR_EMPTY, $1D, $13, $24, $0F, CHAR_EMPTY
+    .byte CHAR_EMPTY, CHAR_S, CHAR_I, CHAR_Z, CHAR_E, CHAR_EMPTY
 
-KonamiCode:
-    .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80
+; KonamiCode:
+;     .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80
+
+; Sinusoid:
+;     .byte 215, 216, 218, 219, 220, 221, 221, 222, 222, 222, 221, 221, 220, 219, 218, 216
+;     .byte 215, 214, 212, 211, 210, 209, 209, 208, 208, 208, 209, 209, 210, 211, 212, 214
+;     .byte 215, 216, 218, 219, 220, 221, 221, 222, 222, 222, 221, 221, 220, 219, 218, 216
+;     .byte 215, 214, 212, 211, 210, 209, 209, 208, 208, 208, 209, 209, 210, 211, 212, 214
+
+Sinusoid:
+    .byte 217, 218, 219, 220, 221, 222, 223, 224, 223, 222, 221, 220, 219, 218, 217, 216
+    .byte 215, 214, 213, 212, 211, 210, 209, 208, 209, 210, 211, 212, 213, 214, 215, 216
+    .byte 217, 218, 219, 220, 221, 222, 223, 224, 223, 222, 221, 220, 219, 218, 217, 216
+    .byte 215, 214, 213, 212, 211, 210, 209, 208, 209, 210, 211, 212, 213, 214, 215, 216

@@ -39,6 +39,57 @@ stateGameStart:
     jmp stateMachineEnd
 
 stateGamePlaying:
+    inc logoWaveStep
+    lda logoWaveStep
+    and #%01111111
+    lsr
+    lsr
+    tay
+
+    lda Sinusoid, y
+    ldx #SpriteLogo0y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo1y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo2y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo3y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo4y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo5y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo6y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo7y
+    sta OAM, x
+    iny
+    iny
+    lda Sinusoid, y
+    ldx #SpriteLogo8y
+    sta OAM, x
+
     ldx #Sprite2y
     inc OAM, x
     ldx #Sprite2x
@@ -515,6 +566,10 @@ updateStatusbar:
         ldx #6
         @updateStatusbarLoop:
             dex
+
+            lda TextEdition, x
+            sta STATUSBAR1+StatusbarOffsetEdition, x
+
             lda TextStomp, x
             sta STATUSBAR1+StatusbarOffsetStomp, x
 
@@ -542,6 +597,10 @@ updateStatusbar:
             sta STATUSBAR1+StatusbarOffsetSizeBar, x
             txa
         bne @updateStatusbarLoop
+
+        lda TextEdition+6
+        sta STATUSBAR1+StatusbarOffsetEdition+6
+
         lda #1
         sta drawStatusbar1Flag
         inc statusbarState

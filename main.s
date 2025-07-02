@@ -64,6 +64,8 @@
     drawStatusbar1Flag: .res 1
     drawStatusbar2Flag: .res 1
 
+    logoWaveStep: .res 1
+
     temp1: .res 1
     temp2: .res 1
     temp2a: .res 1
