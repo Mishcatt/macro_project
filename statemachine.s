@@ -32,6 +32,7 @@ stateGameStart:
 
     lda #0
     sta collisionTimer
+    sta playerStomp
 
     jsr initStatusbar
 
@@ -64,6 +65,22 @@ stateGamePlaying:
     lda playerY
     ldx #Sprites::Sprite6y
     sta OAM, x ; store player sprite Y position
+
+    lda playerStomp
+    cmp #6
+    bcc :+
+        lda #0
+        sta playerStomp
+        inc playerSize
+    :
+
+    lda playerSize
+    cmp #6
+    bcc :+
+        lda #6
+        sta playerSize
+        sta playerStomp
+    :
 
     jsr updateStatusbar
 
