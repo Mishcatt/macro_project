@@ -8,7 +8,7 @@ STATUSBAR2  := $0540  ; two rows of nametable 1
 
 InitialState := 2
 InitialCenter := 4
-InitialPlayerSize := 1
+InitialPlayerSize := 0
 
 MaxPlayerStomp := 6
 MaxPlayerSize := 6
@@ -447,15 +447,6 @@ PlayerSpritesSize6:  ; from lowest to highest
     .byte $70, $71, $72, $73, $74
     .byte $60, $61, $62, $63, $64
     .byte $50, $51, $52, $53, $54
-
-PlayerSpritesJumpTable:
-    .addr PlayerSpritesSize0
-    .addr PlayerSpritesSize1
-    .addr PlayerSpritesSize2
-    .addr PlayerSpritesSize3
-    .addr PlayerSpritesSize4
-    .addr PlayerSpritesSize5
-    .addr PlayerSpritesSize6
 
 ; Sinusoid:
 ;     .byte 215, 216, 218, 219, 220, 221, 221, 222, 222, 222, 221, 221, 220, 219, 218, 216

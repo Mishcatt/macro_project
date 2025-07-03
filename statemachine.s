@@ -117,6 +117,7 @@ stateGamePlaying:
     :
 
     jsr updateStatusbar
+    jsr updatePlayerSprites
 
     jmp stateMachineEnd
 
@@ -590,10 +591,120 @@ updateStatusbar:
     rts
 
 updatePlayerSprites:
+    lda playerSize
+    asl ; x2 
+    tax
+    lda PlayerSpritesJumpTable, x    ; Low byte
+    sta tempAddr
+    lda PlayerSpritesJumpTable+1, x  ; High byte
+    sta tempAddr+1
+    
+    ldy #SpritePlayerR8i
+    ldx #45
+    jmp (tempAddr)
 
-    sta OAM, x
+    updatePlayerSprites0:
+        dex
+        beq :+  ; if x == 0
+            lda PlayerSpritesSize0, x
+            sta OAM, y
+            dey
+            dey
+            dey
+            dey
+            jmp updatePlayerSprites0
+        :
+        jmp updatePlayerSpritesReady
 
-    rts
+    updatePlayerSprites1:
+        dex
+        beq :+  ; if x == 0
+            lda PlayerSpritesSize1, x
+            sta OAM, y
+            dey
+            dey
+            dey
+            dey
+            jmp updatePlayerSprites1
+        :
+        jmp updatePlayerSpritesReady
+
+    updatePlayerSprites2:
+        dex
+        beq :+  ; if x == 0
+            lda PlayerSpritesSize2, x
+            sta OAM, y
+            dey
+            dey
+            dey
+            dey
+            jmp updatePlayerSprites2
+        :
+        jmp updatePlayerSpritesReady
+
+    updatePlayerSprites3:
+        dex
+        beq :+  ; if x == 0
+            lda PlayerSpritesSize3, x
+            sta OAM, y
+            dey
+            dey
+            dey
+            dey
+            jmp updatePlayerSprites3
+        :
+        jmp updatePlayerSpritesReady
+
+    updatePlayerSprites4:
+        dex
+        beq :+  ; if x == 0
+            lda PlayerSpritesSize4, x
+            sta OAM, y
+            dey
+            dey
+            dey
+            dey
+            jmp updatePlayerSprites4
+        :
+        jmp updatePlayerSpritesReady
+
+    updatePlayerSprites5:
+        dex
+        beq :+  ; if x == 0
+            lda PlayerSpritesSize5, x
+            sta OAM, y
+            dey
+            dey
+            dey
+            dey
+            jmp updatePlayerSprites5
+        :
+        jmp updatePlayerSpritesReady
+
+    updatePlayerSprites6:
+        dex
+        beq :+  ; if x == 0
+            lda PlayerSpritesSize6, x
+            sta OAM, y
+            dey
+            dey
+            dey
+            dey
+            jmp updatePlayerSprites6
+        :
+        jmp updatePlayerSpritesReady
+
+    updatePlayerSpritesReady:
+        rts
+
+PlayerSpritesJumpTable:
+    .addr updatePlayerSprites0
+    .addr updatePlayerSprites1
+    .addr updatePlayerSprites2
+    .addr updatePlayerSprites3
+    .addr updatePlayerSprites4
+    .addr updatePlayerSprites5
+    .addr updatePlayerSprites6
 
 StateJumpTable:
     .addr stateGameInit
