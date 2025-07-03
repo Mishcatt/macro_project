@@ -47,65 +47,48 @@ stateGamePlaying:
     tay
 
     lda Sinusoid, y
-    ldx #SpriteLogo0y
-    sta OAM, x
+    sta OAM+SpriteLogo0y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo1y
-    sta OAM, x
+    sta OAM+SpriteLogo1y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo2y
-    sta OAM, x
+    sta OAM+SpriteLogo2y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo3y
-    sta OAM, x
+    sta OAM+SpriteLogo3y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo4y
-    sta OAM, x
+    sta OAM+SpriteLogo4y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo5y
-    sta OAM, x
+    sta OAM+SpriteLogo5y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo6y
-    sta OAM, x
+    sta OAM+SpriteLogo6y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo7y
-    sta OAM, x
+    sta OAM+SpriteLogo7y
     iny
     iny
     lda Sinusoid, y
-    ldx #SpriteLogo8y
-    sta OAM, x
+    sta OAM+SpriteLogo8y
 
-    ldx #Sprite2y
-    inc OAM, x
-    ldx #Sprite2x
-    inc OAM, x
-    ldx #Sprite3y
-    dec OAM, x
-    ldx #Sprite3x
-    dec OAM, x
-    ldx #Sprite4y
-    inc OAM, x
-    ldx #Sprite4x
-    dec OAM, x
-    ldx #Sprite5y
-    dec OAM, x
-    ldx #Sprite5x
-    inc OAM, x
+    inc OAM+Sprite2y
+    inc OAM+Sprite2x
+    dec OAM+Sprite3y
+    dec OAM+Sprite3x
+    inc OAM+Sprite4y
+    dec OAM+Sprite4x
+    dec OAM+Sprite5y
+    inc OAM+Sprite5x
 
 
     jsr getCurrentGroundLevel
@@ -346,10 +329,9 @@ applyControls:
         and #BUTTON_LEFT
         beq checkRightButton
 
-            ldx #SpritePlayerM0a
-            lda OAM, x
+            lda OAM+SpritePlayerM0a
             ora #%01000000
-            sta OAM, x
+            sta OAM+SpritePlayerM0a
 
             ldx playerMaxYleft
             inx
@@ -387,10 +369,9 @@ applyControls:
         and #BUTTON_RIGHT
         beq checkAButton
 
-            ldx #SpritePlayerM0a
-            lda OAM, x
+            lda OAM+SpritePlayerM0a
             and #%10111111
-            sta OAM, x
+            sta OAM+SpritePlayerM0a
 
             ldx playerMaxYright
             inx
@@ -608,7 +589,13 @@ updateStatusbar:
     updateStatusbarEnd:
     rts
 
-JumpTable:
+updatePlayerSprites:
+
+    sta OAM, x
+
+    rts
+
+StateJumpTable:
     .addr stateGameInit
     .addr stateGameMenu
     .addr stateGameStart

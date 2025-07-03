@@ -224,9 +224,9 @@ main_loop:
         lda currentState
         asl ; x2 
         tax
-        lda JumpTable, x        ; Low byte
+        lda StateJumpTable, x        ; Low byte
         sta tempAddr
-        lda JumpTable+1, x      ; High byte
+        lda StateJumpTable+1, x      ; High byte
         sta tempAddr+1
         jmp (tempAddr)          ; Jump to the handler
     stateMachineEnd:
