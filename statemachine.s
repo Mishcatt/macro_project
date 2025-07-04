@@ -605,7 +605,7 @@ updatePlayerSprites:
 
     updatePlayerSprites0:
         dex
-        beq :+  ; if x == 0
+        bmi :+  ; if x == 0
             lda PlayerSpritesSize0, x
             sta OAM, y
             dey
@@ -618,7 +618,7 @@ updatePlayerSprites:
 
     updatePlayerSprites1:
         dex
-        beq :+  ; if x == 0
+        bmi :+  ; if x == 0
             lda PlayerSpritesSize1, x
             sta OAM, y
             dey
@@ -631,7 +631,7 @@ updatePlayerSprites:
 
     updatePlayerSprites2:
         dex
-        beq :+  ; if x == 0
+        bmi :+  ; if x == 0
             lda PlayerSpritesSize2, x
             sta OAM, y
             dey
@@ -644,7 +644,7 @@ updatePlayerSprites:
 
     updatePlayerSprites3:
         dex
-        beq :+  ; if x == 0
+        bmi :+  ; if x == 0
             lda PlayerSpritesSize3, x
             sta OAM, y
             dey
@@ -657,7 +657,7 @@ updatePlayerSprites:
 
     updatePlayerSprites4:
         dex
-        beq :+  ; if x == 0
+        bmi :+  ; if x == 0
             lda PlayerSpritesSize4, x
             sta OAM, y
             dey
@@ -670,7 +670,7 @@ updatePlayerSprites:
 
     updatePlayerSprites5:
         dex
-        beq :+  ; if x == 0
+        bmi :+  ; if x == 0
             lda PlayerSpritesSize5, x
             sta OAM, y
             dey
@@ -683,7 +683,7 @@ updatePlayerSprites:
 
     updatePlayerSprites6:
         dex
-        beq :+  ; if x == 0
+        bmi :+  ; if x == 0
             lda PlayerSpritesSize6, x
             sta OAM, y
             dey
