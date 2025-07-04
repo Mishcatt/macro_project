@@ -96,9 +96,9 @@ stateGamePlaying:
     jsr applyControls
     jsr applyCollisions
 
-    lda playerY
-    ldx #SpritePlayerM0y
-    sta OAM, x ; store player sprite Y position
+    ; lda playerY
+    ; ldx #SpritePlayerM0y
+    ; sta OAM, x ; store player sprite Y position
 
     lda playerStomp
     cmp #6
@@ -408,7 +408,8 @@ applyControls:
             lda playerY
             cmp playerMaxY
             bne :+
-                lda #JumpVelocity
+                ldx playerSize
+                lda JumpVelocity, x
                 sta playerVelocityY
                 dec playerY
             :
@@ -601,30 +602,29 @@ updatePlayerSprites:
     
     ldy #SpritePlayerR8i
     ldx #45
+    lda playerY
+    sec
+    sbc #64
+    sta temp1
+    lda #5
+    sta temp2
     jmp (tempAddr)
 
     updatePlayerSprites0:
         dex
         bmi :+  ; if x == 0
             lda PlayerSpritesSize0, x
-            sta OAM, y
-            dey
-            dey
-            dey
-            dey
+            jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites0
         :
+
         jmp updatePlayerSpritesReady
 
     updatePlayerSprites1:
         dex
         bmi :+  ; if x == 0
             lda PlayerSpritesSize1, x
-            sta OAM, y
-            dey
-            dey
-            dey
-            dey
+            jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites1
         :
         jmp updatePlayerSpritesReady
@@ -633,11 +633,7 @@ updatePlayerSprites:
         dex
         bmi :+  ; if x == 0
             lda PlayerSpritesSize2, x
-            sta OAM, y
-            dey
-            dey
-            dey
-            dey
+            jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites2
         :
         jmp updatePlayerSpritesReady
@@ -646,11 +642,7 @@ updatePlayerSprites:
         dex
         bmi :+  ; if x == 0
             lda PlayerSpritesSize3, x
-            sta OAM, y
-            dey
-            dey
-            dey
-            dey
+            jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites3
         :
         jmp updatePlayerSpritesReady
@@ -659,11 +651,7 @@ updatePlayerSprites:
         dex
         bmi :+  ; if x == 0
             lda PlayerSpritesSize4, x
-            sta OAM, y
-            dey
-            dey
-            dey
-            dey
+            jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites4
         :
         jmp updatePlayerSpritesReady
@@ -672,11 +660,7 @@ updatePlayerSprites:
         dex
         bmi :+  ; if x == 0
             lda PlayerSpritesSize5, x
-            sta OAM, y
-            dey
-            dey
-            dey
-            dey
+            jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites5
         :
         jmp updatePlayerSpritesReady
@@ -685,17 +669,34 @@ updatePlayerSprites:
         dex
         bmi :+  ; if x == 0
             lda PlayerSpritesSize6, x
-            sta OAM, y
-            dey
-            dey
-            dey
-            dey
+            jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites6
         :
         jmp updatePlayerSpritesReady
 
     updatePlayerSpritesReady:
         rts
+
+updatePlayerSpritesInternal:
+    sta OAM, y
+    dey
+    lda temp1
+    sta OAM,y
+    dey
+    dey
+    dey
+    
+    dec temp2
+    bne :+
+        lda #5
+        sta temp2
+        lda temp1
+        clc
+        adc #8
+        sta temp1
+    :
+
+    rts
 
 PlayerSpritesJumpTable:
     .addr updatePlayerSprites0

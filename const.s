@@ -14,7 +14,6 @@ MaxPlayerStomp := 6
 MaxPlayerSize := 6
 
 GravityValue := 1
-JumpVelocity := $F8 ; -8
 CollisionTimerValue := 4
 
 DMCIRQenableValue := 0
@@ -370,6 +369,9 @@ TextSize:
 
 ; KonamiCode:
 ;     .byte $08, $08, $04, $04, $02, $01, $02, $01, $40, $80
+
+JumpVelocity:
+    .byte $F8, $F6, $F4, $F2, $F0, $EE, $EC
 
 PlayerSpritesSize0:  ; from lowest to highest
     .byte SPRITE_EMPTY, SPRITE_EMPTY, SPRITE_SZNEQZ, SPRITE_EMPTY, SPRITE_EMPTY
