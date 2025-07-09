@@ -37,6 +37,7 @@
     playerTempVelocityX: .res 1
     playerSize: .res 1
     playerStomp: .res 1
+    playerDirection: .res 1
 
     currentCenter: .res 1
     currentMapColumn: .res 1 ; 32

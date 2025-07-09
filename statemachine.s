@@ -30,6 +30,9 @@ stateGameStart:
     lda #InitialPlayerSize
     sta playerSize
 
+    lda #InitialPlayerDirection
+    sta playerDirection
+
     lda #0
     sta collisionTimer
     sta playerStomp
@@ -325,14 +328,12 @@ applyControls:
     :
 
     checkLeftButton:
-        ; ldx #Sprites::Sprite6x
         lda buttons1
         and #BUTTON_LEFT
         beq checkRightButton
 
-            lda OAM+SpritePlayerM0a
-            ora #%01000000
-            sta OAM+SpritePlayerM0a
+            lda #PlayerDirectionLeft
+            sta playerDirection
 
             ldx playerMaxYleft
             inx
@@ -370,9 +371,8 @@ applyControls:
         and #BUTTON_RIGHT
         beq checkAButton
 
-            lda OAM+SpritePlayerM0a
-            and #%10111111
-            sta OAM+SpritePlayerM0a
+            lda #PlayerDirectionRight
+            sta playerDirection
 
             ldx playerMaxYright
             inx
@@ -600,7 +600,7 @@ updatePlayerSprites:
     lda PlayerSpritesJumpTable+1, x  ; High byte
     sta tempAddr+1
     
-    ldy #SpritePlayerR8i
+    ldy #SpritePlayerR8a
     ldx #45
     lda playerY
     sec
@@ -608,70 +608,117 @@ updatePlayerSprites:
     sta temp1
     lda #5
     sta temp2
+
+    lda playerDirection
+    sta OAM, y
+    dey
+    
     jmp (tempAddr)
 
     updatePlayerSprites0:
         dex
-        bmi :+  ; if x == 0
-            lda PlayerSpritesSize0, x
+        bmi updatePlayerSprites0end  ; if x == 0
+            bit playerDirection
+            bvs :+
+                lda PlayerSpritesSize0R, x
+                jmp :++
+            :
+                lda PlayerSpritesSize0L, x
+            :
             jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites0
-        :
+        updatePlayerSprites0end:
 
         jmp updatePlayerSpritesReady
 
     updatePlayerSprites1:
         dex
-        bmi :+  ; if x == 0
-            lda PlayerSpritesSize1, x
+        bmi updatePlayerSprites1end  ; if x == 0
+            bit playerDirection
+            bvs :+
+                lda PlayerSpritesSize1R, x
+                jmp :++
+            :
+                lda PlayerSpritesSize1L, x
+            :
             jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites1
-        :
+        updatePlayerSprites1end:
         jmp updatePlayerSpritesReady
 
     updatePlayerSprites2:
         dex
-        bmi :+  ; if x == 0
-            lda PlayerSpritesSize2, x
+        bmi updatePlayerSprites2end  ; if x == 0
+            bit playerDirection
+            bvs :+
+                lda PlayerSpritesSize2R, x
+                jmp :++
+            :
+                lda PlayerSpritesSize2L, x
+            :
             jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites2
-        :
+        updatePlayerSprites2end:
         jmp updatePlayerSpritesReady
 
     updatePlayerSprites3:
         dex
-        bmi :+  ; if x == 0
-            lda PlayerSpritesSize3, x
+        bmi updatePlayerSprites3end  ; if x == 0
+            bit playerDirection
+            bvs :+
+                lda PlayerSpritesSize3R, x
+                jmp :++
+            :
+                lda PlayerSpritesSize3L, x
+            :
             jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites3
-        :
+        updatePlayerSprites3end:
         jmp updatePlayerSpritesReady
 
     updatePlayerSprites4:
         dex
-        bmi :+  ; if x == 0
-            lda PlayerSpritesSize4, x
+        bmi updatePlayerSprites4end  ; if x == 0
+            bit playerDirection
+            bvs :+
+                lda PlayerSpritesSize4R, x
+                jmp :++
+            :
+                lda PlayerSpritesSize4L, x
+            :
             jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites4
-        :
+        updatePlayerSprites4end:
         jmp updatePlayerSpritesReady
 
     updatePlayerSprites5:
         dex
-        bmi :+  ; if x == 0
-            lda PlayerSpritesSize5, x
+        bmi updatePlayerSprites5end  ; if x == 0
+            bit playerDirection
+            bvs :+
+                lda PlayerSpritesSize5R, x
+                jmp :++
+            :
+                lda PlayerSpritesSize5L, x
+            :
             jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites5
-        :
+        updatePlayerSprites5end:
         jmp updatePlayerSpritesReady
 
     updatePlayerSprites6:
         dex
-        bmi :+  ; if x == 0
-            lda PlayerSpritesSize6, x
+        bmi updatePlayerSprites6end  ; if x == 0
+            bit playerDirection
+            bvs :+
+                lda PlayerSpritesSize6R, x
+                jmp :++
+            :
+                lda PlayerSpritesSize6L, x
+            :
             jsr updatePlayerSpritesInternal
             jmp updatePlayerSprites6
-        :
+        updatePlayerSprites6end:
         jmp updatePlayerSpritesReady
 
     updatePlayerSpritesReady:
@@ -681,9 +728,11 @@ updatePlayerSpritesInternal:
     sta OAM, y
     dey
     lda temp1
-    sta OAM,y
+    sta OAM, y
     dey
     dey
+    lda playerDirection
+    sta OAM, y
     dey
     
     dec temp2
