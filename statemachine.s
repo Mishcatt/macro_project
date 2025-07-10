@@ -93,15 +93,10 @@ stateGamePlaying:
     dec OAM+Sprite5y
     inc OAM+Sprite5x
 
-
     jsr getCurrentGroundLevel
     jsr applyGravity
     jsr applyControls
     jsr applyCollisions
-
-    ; lda playerY
-    ; ldx #SpritePlayerM0y
-    ; sta OAM, x ; store player sprite Y position
 
     lda playerStomp
     cmp #6
@@ -309,6 +304,14 @@ applyControls:
         bcc :+
             lda #MaxPlayerStomp
             sta playerStomp
+    :
+
+    lda tempButtons1
+    and #BUTTON_START
+    beq :+
+        lda dmcIRQenable
+        eor #1
+        sta dmcIRQenable
     :
 
     lda buttons1
@@ -722,6 +725,7 @@ updatePlayerSprites:
         jmp updatePlayerSpritesReady
 
     updatePlayerSpritesReady:
+
         rts
 
 updatePlayerSpritesInternal:
@@ -731,10 +735,14 @@ updatePlayerSpritesInternal:
     sta OAM, y
     dey
     dey
-    lda playerDirection
-    sta OAM, y
-    dey
-    
+    tya
+    cmp #SpritePlayerL0y
+    bcc :+
+        lda playerDirection
+        sta OAM, y
+        dey
+    :
+
     dec temp2
     bne :+
         lda #5
